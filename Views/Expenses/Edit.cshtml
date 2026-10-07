@@ -4,35 +4,141 @@
     ViewData["Title"] = "Edit Expense";
 }
 
-<h1>Edit Expense</h1>
+<div class="container mt-4">
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row justify-content-center">
 
-    <div class="form-group mb-2">
-        <label>Category</label>
-        <input asp-for="Category" class="form-control" />
-        <span asp-validation-for="Category" class="text-danger"></span>
+        <div class="col-md-6">
+
+            <div class="card p-4 shadow-sm">
+
+                <h2 class="mb-4">Edit Expense</h2>
+
+                <form asp-action="Edit" method="post">
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div asp-validation-summary="All"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="Amount"
+                               class="form-label">
+                            Amount
+                        </label>
+
+                        <input asp-for="Amount"
+                               class="form-control"
+                               type="number"
+                               step="0.01" />
+
+                        <span asp-validation-for="Amount"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="Category"
+                               class="form-label">
+                            Category
+                        </label>
+
+                        <select asp-for="Category"
+                                class="form-select">
+
+                            @foreach (var category in SmartExpenseManager.Models.ExpenseOptions.Categories)
+                            {
+                                <option value="@category">
+                                    @category
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="Category"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="Description"
+                               class="form-label">
+                            Description
+                        </label>
+
+                        <input asp-for="Description"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="ExpenseDate"
+                               class="form-label">
+                            Date
+                        </label>
+
+                        <input asp-for="ExpenseDate"
+                               class="form-control"
+                               type="date" />
+
+                        <span asp-validation-for="ExpenseDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label asp-for="PaymentMethod"
+                               class="form-label">
+                            Payment Method
+                        </label>
+
+                        <select asp-for="PaymentMethod"
+                                class="form-select">
+
+                            @foreach (var method in SmartExpenseManager.Models.ExpenseOptions.PaymentMethods)
+                            {
+                                <option value="@method">
+                                    @method
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="PaymentMethod"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Save Changes
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="form-group mb-2">
-        <label>Amount</label>
-        <input asp-for="Amount" class="form-control" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-2">
-        <label>Date</label>
-        <input asp-for="Date" class="form-control" type="date" />
-        <span asp-validation-for="Date" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-2">
-        <label>Description</label>
-        <input asp-for="Description" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-2">Save</button>
-    <a asp-action="Index" class="btn btn-secondary mt-2">Cancel</a>
-</form>
+</div>

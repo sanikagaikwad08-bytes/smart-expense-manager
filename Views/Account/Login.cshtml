@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5">
+
+            <div class="card p-4 shadow-sm">
+
+                <h2 class="text-center mb-4">Login</h2>
+
+                <form asp-action="Login" method="post">
+
+                    <div asp-validation-summary="All"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               placeholder="Enter your email"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               placeholder="Enter your password"
+                               required />
+                    </div>
+
+                    <div class="form-check mb-3">
+
+                        <input type="checkbox"
+                               name="rememberMe"
+                               value="true"
+                               class="form-check-input"
+                               id="rememberMe" />
+
+                        <label class="form-check-label"
+                               for="rememberMe">
+                            Remember me
+                        </label>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        Login
+                    </button>
+
+                </form>
+
+                @if (ViewBag.GoogleEnabled == true)
+                {
+                    <div class="text-center my-3">
+                        <span class="text-muted">or</span>
+                    </div>
+
+                    <a asp-action="GoogleLogin"
+                       class="btn btn-outline-dark w-100">
+                        Continue with Google
+                    </a>
+                }
+
+                <div class="text-center mt-3">
+
+                    <p class="mb-0">
+                        Don't have an account?
+                        <a asp-controller="Account"
+                           asp-action="Register">
+                            Create Account
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

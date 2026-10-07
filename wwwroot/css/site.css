@@ -1,31 +1,296 @@
-html {
-  font-size: 14px;
-}
+/* =========================================
+   Smart Expense Manager
+   Professional Modern Design
+   ========================================= */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+/* ---------- Page ---------- */
 
 html {
-  position: relative;
-  min-height: 100%;
+    font-size: 14px;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #F5F7FA;
+    color: #1F2937;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+
+/* ---------- Main Content ---------- */
+
+main {
+    min-height: 75vh;
+    padding-bottom: 50px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+
+/* ---------- Navbar ---------- */
+
+.navbar {
+    background: #FFFFFF !important;
+    padding: 15px 0;
+    border-bottom: 1px solid #D9DEE7 !important;
+}
+
+.navbar-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827 !important;
+}
+
+.nav-link {
+    color: #475569 !important;
+    font-weight: 500;
+    margin-left: 12px;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #2563EB !important;
+}
+
+
+/* ---------- Headings ---------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #111827;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   CARDS
+   ========================================= */
+
+.card {
+    background: #EEF0F7 !important;
+    border: 1px solid #C7CBD9 !important;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05) !important;
+}
+
+.card:hover {
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+
+/* =========================================
+   TABLE
+   ========================================= */
+
+/* Outer table box */
+
+.table-responsive {
+    background: #EEF0F7 !important;
+    border: 1px solid #BFC5D4 !important;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+/* Entire table */
+
+.table {
+    width: 100%;
+    margin: 0 !important;
+    background: #EEF0F7 !important;
+    border-collapse: collapse;
+}
+
+
+/* Table header */
+
+.table thead th {
+    background: #E4E7F0 !important;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 14px 12px;
+
+    border: 1px solid #C7CBD9 !important;
+}
+
+
+/* Table cells */
+
+.table tbody td {
+    background: #EEF0F7 !important;
+    color: #1F2937;
+    padding: 14px 12px;
+    vertical-align: middle;
+
+    border: 1px solid #C7CBD9 !important;
+}
+
+
+/* Table row hover */
+
+.table tbody tr:hover td {
+    background: #E8EAF2 !important;
+}
+
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 9px 18px;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    background: #2563EB;
+    border-color: #2563EB;
+}
+
+.btn-primary:hover {
+    background: #1D4ED8;
+    border-color: #1D4ED8;
+}
+
+.btn-outline-primary {
+    color: #2563EB;
+    border-color: #2563EB;
+}
+
+.btn-outline-primary:hover {
+    background: #2563EB;
+    border-color: #2563EB;
+    color: #FFFFFF;
+}
+
+.btn-outline-danger {
+    color: #DC2626;
+    border-color: #DC2626;
+}
+
+.btn-outline-danger:hover {
+    background: #DC2626;
+    border-color: #DC2626;
+    color: #FFFFFF;
+}
+
+.btn-secondary {
+    background: #64748B;
+    border-color: #64748B;
+}
+
+
+/* =========================================
+   FORMS
+   ========================================= */
+
+.form-control,
+.form-select {
+    background: #FFFFFF;
+    border: 1px solid #BFC5D4;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================================
+   TEXT
+   ========================================= */
+
+.text-muted {
+    color: #64748B !important;
+}
+
+
+/* =========================================
+   LINKS
+   ========================================= */
+
+a {
+    color: #2563EB;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #1D4ED8;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+footer {
+    position: static !important;
+    width: 100%;
+    background: #FFFFFF;
+    border-top: 1px solid #D9DEE7 !important;
+    padding: 20px 0;
+    margin-top: 40px;
+    line-height: normal;
+}
+
+footer .container {
+    color: #64748B;
+}
+
+
+/* =========================================
+   VALIDATION
+   ========================================= */
+
+.text-danger {
+    font-size: 14px;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .navbar {
+        padding: 12px 0;
+    }
+
+    .navbar-brand {
+        font-size: 18px;
+    }
+
+    .nav-link {
+        margin-left: 0;
+        padding: 8px 0;
+    }
+
+    main {
+        padding-bottom: 30px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
 }

@@ -1,8 +1,105 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Smart Expense Manager";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Smart Expense Manager</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4">Smart Expense Manager</h1>
+
+        <p class="lead text-muted">
+            Track your expenses and understand where your money goes.
+        </p>
+
+        <div class="mt-4">
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="btn btn-primary me-2">
+                Create Account
+            </a>
+
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn btn-outline-primary">
+                Login
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+    <div class="col-md-4">
+
+        <a asp-controller="Expenses"
+           asp-action="Index"
+           class="text-decoration-none text-dark">
+
+            <div class="card p-4 shadow-sm h-100">
+
+                <h4>Track Expenses</h4>
+
+                <p class="text-muted">
+                    Add and manage your daily expenses in one place.
+                </p>
+
+                <span class="btn btn-outline-primary">
+                    View Expenses
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-md-4">
+
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="text-decoration-none text-dark">
+
+            <div class="card p-4 shadow-sm h-100">
+
+                <h4>View Dashboard</h4>
+
+                <p class="text-muted">
+                    See your total spending and recent transactions.
+                </p>
+
+                <span class="btn btn-outline-primary">
+                    Open Dashboard
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-md-4">
+
+        <a asp-controller="Profile"
+           asp-action="Index"
+           class="text-decoration-none text-dark">
+
+            <div class="card p-4 shadow-sm h-100">
+
+                <h4>Manage Profile</h4>
+
+                <p class="text-muted">
+                    Keep your account information up to date.
+                </p>
+
+                <span class="btn btn-outline-primary">
+                    View Profile
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
 </div>
