@@ -27,6 +27,8 @@ namespace SmartExpenseManager.Controllers
             !string.IsNullOrEmpty(_config["Authentication:Google:ClientId"]) &&
             !string.IsNullOrEmpty(_config["Authentication:Google:ClientSecret"]);
 
+        // ---------------- REGISTER ----------------
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -37,58 +39,73 @@ namespace SmartExpenseManager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(
-            string name,
-            string email,
+            string username,
             string password,
             string confirmPassword)
         {
             ViewBag.GoogleEnabled = GoogleEnabled;
 
-            if (string.IsNullOrWhiteSpace(name) ||
-                string.IsNullOrWhiteSpace(email) ||
+            if (string.IsNullOrWhiteSpace(username) ||
                 string.IsNullOrWhiteSpace(password))
             {
-                ModelState.AddModelError("", "Please fill in all required fields.");
+                ModelState.AddModelError(
+                    "",
+                    "Please enter a username and password.");
+
                 return View();
             }
 
             if (password != confirmPassword)
             {
-                ModelState.AddModelError("", "Passwords do not match.");
+                ModelState.AddModelError(
+                    "",
+                    "Passwords do not match.");
+
                 return View();
             }
 
-            var existing = await _userManager.FindByEmailAsync(email);
+            var existingUser =
+                await _userManager.FindByNameAsync(username);
 
-            if (existing != null)
+            if (existingUser != null)
             {
-                ModelState.AddModelError("", "An account with this email already exists.");
+                ModelState.AddModelError(
+                    "",
+                    "This username is already taken.");
+
                 return View();
             }
 
             var user = new ApplicationUser
             {
-                UserName = email,
-                Email = email,
-                FullName = name,
+                UserName = username,
+                FullName = username,
                 CreatedAt = DateTime.UtcNow
             };
 
-            var result = await _userManager.CreateAsync(user, password);
+            var result =
+                await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, true);
-                return RedirectToAction("Index", "Dashboard");
+
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard");
             }
 
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError(
+                    "",
+                    error.Description);
             }
 
             return View();
         }
+
+        // ---------------- LOGIN ----------------
 
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
@@ -102,7 +119,7 @@ namespace SmartExpenseManager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(
-            string email,
+            string username,
             string password,
             bool rememberMe = false,
             string? returnUrl = null)
@@ -110,11 +127,24 @@ namespace SmartExpenseManager.Controllers
             ViewBag.GoogleEnabled = GoogleEnabled;
             ViewBag.ReturnUrl = returnUrl;
 
-            var result = await _signInManager.PasswordSignInAsync(
-                email,
-                password,
-                rememberMe,
-                lockoutOnFailure: false);
+            var user =
+                await _userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Invalid username or password.");
+
+                return View();
+            }
+
+            var result =
+                await _signInManager.PasswordSignInAsync(
+                    user,
+                    password,
+                    rememberMe,
+                    lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
@@ -124,13 +154,19 @@ namespace SmartExpenseManager.Controllers
                     return Redirect(returnUrl);
                 }
 
-                return RedirectToAction("Index", "Dashboard");
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard");
             }
 
-            ModelState.AddModelError("", "Invalid email or password.");
+            ModelState.AddModelError(
+                "",
+                "Invalid username or password.");
 
             return View();
         }
+
+        // ---------------- LOGOUT ----------------
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -138,8 +174,12 @@ namespace SmartExpenseManager.Controllers
         {
             await _signInManager.SignOutAsync();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(
+                "Index",
+                "Home");
         }
+
+        // ---------------- GOOGLE ----------------
 
         [HttpGet]
         public IActionResult GoogleLogin(string? returnUrl = null)
@@ -154,17 +194,23 @@ namespace SmartExpenseManager.Controllers
                     GoogleScheme,
                     redirectUrl);
 
-            return Challenge(properties, GoogleScheme);
+            return Challenge(
+                properties,
+                GoogleScheme);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GoogleResponse(string? returnUrl = null)
+        public async Task<IActionResult> GoogleResponse(
+            string? returnUrl = null)
         {
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            var info =
+                await _signInManager.GetExternalLoginInfoAsync();
 
             if (info == null)
             {
-                TempData["Error"] = "Google login failed.";
+                TempData["Error"] =
+                    "Google login failed.";
+
                 return RedirectToAction("Login");
             }
 
@@ -176,22 +222,29 @@ namespace SmartExpenseManager.Controllers
 
             if (signInResult.Succeeded)
             {
-                return RedirectToAction("Index", "Dashboard");
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard");
             }
 
-            var email = info.Principal
-                .FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var email =
+                info.Principal.FindFirst(
+                    System.Security.Claims.ClaimTypes.Email)?.Value;
 
-            var name = info.Principal
-                .FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            var name =
+                info.Principal.FindFirst(
+                    System.Security.Claims.ClaimTypes.Name)?.Value;
 
             if (string.IsNullOrEmpty(email))
             {
-                TempData["Error"] = "Could not retrieve email.";
+                TempData["Error"] =
+                    "Could not retrieve Google account information.";
+
                 return RedirectToAction("Login");
             }
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var user =
+                await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
@@ -203,19 +256,29 @@ namespace SmartExpenseManager.Controllers
                     CreatedAt = DateTime.UtcNow
                 };
 
-                var createResult = await _userManager.CreateAsync(user);
+                var createResult =
+                    await _userManager.CreateAsync(user);
 
                 if (!createResult.Succeeded)
                 {
-                    TempData["Error"] = "Could not create account.";
+                    TempData["Error"] =
+                        "Could not create Google account.";
+
                     return RedirectToAction("Login");
                 }
             }
 
-            await _userManager.AddLoginAsync(user, info);
-            await _signInManager.SignInAsync(user, true);
+            await _userManager.AddLoginAsync(
+                user,
+                info);
 
-            return RedirectToAction("Index", "Dashboard");
+            await _signInManager.SignInAsync(
+                user,
+                true);
+
+            return RedirectToAction(
+                "Index",
+                "Dashboard");
         }
     }
 }

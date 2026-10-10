@@ -1,10 +1,10 @@
 /* =========================================
    Smart Expense Manager
-   Professional Modern Design
+   Modern Clean Dashboard
    ========================================= */
 
 
-/* ---------- Page ---------- */
+/* ---------- Basic Page ---------- */
 
 html {
     font-size: 14px;
@@ -15,8 +15,8 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background: #F5F7FA;
-    color: #1F2937;
+    background: #f7f8fc;
+    color: #1f2937;
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -25,16 +25,16 @@ body {
 
 main {
     min-height: 75vh;
-    padding-bottom: 50px;
+    padding-bottom: 40px;
 }
 
 
 /* ---------- Navbar ---------- */
 
 .navbar {
-    background: #FFFFFF !important;
+    background: #ffffff !important;
     padding: 15px 0;
-    border-bottom: 1px solid #D9DEE7 !important;
+    border-bottom: 1px solid #e5e7eb !important;
 }
 
 .navbar-brand {
@@ -44,14 +44,14 @@ main {
 }
 
 .nav-link {
-    color: #475569 !important;
+    color: #4b5563 !important;
     font-weight: 500;
     margin-left: 12px;
     transition: color 0.2s ease;
 }
 
 .nav-link:hover {
-    color: #2563EB !important;
+    color: #2563eb !important;
 }
 
 
@@ -68,81 +68,80 @@ h6 {
 }
 
 
-/* =========================================
-   CARDS
-   ========================================= */
+/* ---------- Main Cards ---------- */
 
 .card {
-    background: #EEF0F7 !important;
-    border: 1px solid #C7CBD9 !important;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05) !important;
+    background: #f7f4fc;
+    border: 1px solid #e8e1f2;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
 }
 
 .card:hover {
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
 }
 
 
-/* =========================================
-   TABLE
-   ========================================= */
-
-/* Outer table box */
+/* ---------- Table Container ---------- */
 
 .table-responsive {
-    background: #EEF0F7 !important;
-    border: 1px solid #BFC5D4 !important;
-    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #dfe3eb;
+    border-radius: 10px;
     overflow: hidden;
 }
 
 
-/* Entire table */
+/* ---------- Table ---------- */
 
 .table {
     width: 100%;
-    margin: 0 !important;
-    background: #EEF0F7 !important;
-    border-collapse: collapse;
+    margin: 0;
+    background: #ffffff;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 
-/* Table header */
+/* Table Header */
 
 .table thead th {
-    background: #E4E7F0 !important;
-    color: #334155;
+    background: #fafbfc;
+    color: #475569;
     font-size: 14px;
     font-weight: 600;
     padding: 14px 12px;
-
-    border: 1px solid #C7CBD9 !important;
+    border-bottom: 1px solid #dfe3eb;
 }
 
 
-/* Table cells */
+/* Table Rows */
 
 .table tbody td {
-    background: #EEF0F7 !important;
-    color: #1F2937;
     padding: 14px 12px;
     vertical-align: middle;
-
-    border: 1px solid #C7CBD9 !important;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 
-/* Table row hover */
+/* Remove line from last row */
 
-.table tbody tr:hover td {
-    background: #E8EAF2 !important;
+.table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 
-/* =========================================
-   BUTTONS
-   ========================================= */
+/* Slight row hover */
+
+.table tbody tr:hover {
+    background: #faf9fd;
+}
+
+
+/* ---------- Buttons ---------- */
 
 .btn {
     border-radius: 8px;
@@ -152,116 +151,97 @@ h6 {
 }
 
 .btn-primary {
-    background: #2563EB;
-    border-color: #2563EB;
+    background: #2563eb;
+    border-color: #2563eb;
 }
 
 .btn-primary:hover {
-    background: #1D4ED8;
-    border-color: #1D4ED8;
+    background: #1d4ed8;
+    border-color: #1d4ed8;
 }
 
 .btn-outline-primary {
-    color: #2563EB;
-    border-color: #2563EB;
+    color: #2563eb;
+    border-color: #2563eb;
 }
 
 .btn-outline-primary:hover {
-    background: #2563EB;
-    border-color: #2563EB;
-    color: #FFFFFF;
-}
-
-.btn-outline-danger {
-    color: #DC2626;
-    border-color: #DC2626;
-}
-
-.btn-outline-danger:hover {
-    background: #DC2626;
-    border-color: #DC2626;
-    color: #FFFFFF;
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
 }
 
 .btn-secondary {
-    background: #64748B;
-    border-color: #64748B;
+    background: #64748b;
+    border-color: #64748b;
+}
+
+.btn-danger {
+    border-radius: 8px;
 }
 
 
-/* =========================================
-   FORMS
-   ========================================= */
+/* ---------- Forms ---------- */
 
 .form-control,
 .form-select {
-    background: #FFFFFF;
-    border: 1px solid #BFC5D4;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
     padding: 10px 12px;
 }
 
 .form-control:focus,
 .form-select:focus {
-    border-color: #2563EB;
+    border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 
-/* =========================================
-   TEXT
-   ========================================= */
+/* ---------- Text ---------- */
 
 .text-muted {
-    color: #64748B !important;
+    color: #64748b !important;
 }
 
 
-/* =========================================
-   LINKS
-   ========================================= */
+/* ---------- Links ---------- */
 
 a {
-    color: #2563EB;
+    color: #2563eb;
     text-decoration: none;
 }
 
 a:hover {
-    color: #1D4ED8;
+    color: #1d4ed8;
 }
 
 
-/* =========================================
-   FOOTER
-   ========================================= */
+/* ---------- Footer ---------- */
 
 footer {
     position: static !important;
     width: 100%;
-    background: #FFFFFF;
-    border-top: 1px solid #D9DEE7 !important;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb !important;
     padding: 20px 0;
     margin-top: 40px;
     line-height: normal;
 }
 
 footer .container {
-    color: #64748B;
+    color: #64748b;
 }
 
 
-/* =========================================
-   VALIDATION
-   ========================================= */
+/* ---------- Validation ---------- */
 
 .text-danger {
     font-size: 14px;
 }
 
 
-/* =========================================
-   MOBILE
-   ========================================= */
+/* ---------- Mobile ---------- */
 
 @media (max-width: 768px) {
 
@@ -283,14 +263,272 @@ footer .container {
     }
 
     .card {
-        border-radius: 10px;
-    }
-
-    .table-responsive {
-        border-radius: 8px;
+        border-radius: 12px;
     }
 
     h1 {
         font-size: 32px;
     }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+/* Smart Expense Manager Logo */
+
+.expense-logo {
+    width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #EEF0F7;
+    color: #2563EB;
+
+    border: 1px solid #C7CBD9;
+    border-radius: 10px;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+
+/* Login button */
+
+.login-btn {
+    border-radius: 8px;
+    padding: 7px 16px;
+}
+
+
+/* Sign Up button */
+
+.signup-btn {
+    border-radius: 8px;
+    padding: 7px 16px;
+}
+
+
+/* Small screens */
+
+@media (max-width: 576px) {
+
+    .expense-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    .navbar-brand {
+        font-size: 16px;
+    }
+
+    .login-btn,
+    .signup-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+}
+
+/* =========================================
+   Responsive Navbar
+   Desktop → Tablet → Mobile
+   ========================================= */
+
+.navbar-main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 58px;
+}
+
+
+/* Logo */
+
+.expense-logo {
+    width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #EEF0F7;
+    color: #2563EB;
+
+    border: 1px solid #C7CBD9;
+    border-radius: 10px;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    flex-shrink: 0;
+}
+
+
+/* Website name */
+
+.website-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+}
+
+
+/* Right side */
+
+.navbar-right {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+/* Login */
+
+.login-btn,
+.signup-btn {
+    border-radius: 8px;
+    padding: 7px 16px;
+
+    white-space: nowrap;
+}
+
+
+/* Hamburger */
+
+.navbar-toggler {
+    margin-left: 2px;
+    padding: 6px 9px;
+
+    border-radius: 8px;
+}
+
+
+/* Menu */
+
+#mainMenu {
+    width: 100%;
+    flex-basis: 100%;
+}
+
+#mainMenu .navbar-nav {
+    padding-top: 10px;
+    padding-bottom: 4px;
+}
+
+#mainMenu .nav-link {
+    margin-left: 0;
+    padding: 8px 0;
+}
+
+
+/* =========================================
+   Tablet
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .website-name {
+        font-size: 18px;
+    }
+
+    .expense-logo {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .login-btn,
+    .signup-btn {
+        padding: 7px 12px;
+        font-size: 14px;
+    }
+
+}
+
+
+/* =========================================
+   Small phones
+   ========================================= */
+
+@media (max-width: 576px) {
+
+    .navbar {
+        padding: 10px 0;
+    }
+
+    .navbar-main {
+        min-height: 50px;
+    }
+
+    .website-name {
+        font-size: 15px;
+    }
+
+    .expense-logo {
+        width: 32px;
+        height: 32px;
+        font-size: 17px;
+        border-radius: 8px;
+    }
+
+    .navbar-brand .ms-2 {
+        margin-left: 6px !important;
+    }
+
+    .navbar-right {
+        gap: 5px;
+    }
+
+    .login-btn,
+    .signup-btn {
+        padding: 6px 9px;
+        font-size: 12px;
+    }
+
+    .navbar-toggler {
+        padding: 5px 7px;
+    }
+
+}
+
+
+/* =========================================
+   Very small phones
+   ========================================= */
+
+@media (max-width: 400px) {
+
+    .website-name {
+        font-size: 13px;
+    }
+
+    .expense-logo {
+        width: 29px;
+        height: 29px;
+        font-size: 15px;
+    }
+
+    .login-btn,
+    .signup-btn {
+        padding: 5px 7px;
+        font-size: 11px;
+    }
+
+    .navbar-toggler {
+        padding: 4px 6px;
+    }
+
 }

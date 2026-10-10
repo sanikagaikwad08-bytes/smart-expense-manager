@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="utf-8" />
 
     <meta name="viewport"
@@ -19,69 +20,139 @@
     <link rel="stylesheet"
           href="~/SmartExpenseManager.styles.css"
           asp-append-version="true" />
+
 </head>
+
 
 <body>
 
     <header>
 
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-light bg-white border-bottom box-shadow mb-3">
 
-            <div class="container-fluid">
+            <div class="container-fluid navbar-main">
 
-                <a class="navbar-brand"
+
+                <!-- Logo + Website Name -->
+
+                <a class="navbar-brand d-flex align-items-center"
                    asp-controller="Home"
                    asp-action="Index">
-                    SmartExpenseManager
+
+                    <span class="expense-logo">
+                        ₹
+                    </span>
+
+                    <span class="website-name">
+                        SmartExpenseManager
+                    </span>
+
                 </a>
 
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
 
-                    <span class="navbar-toggler-icon"></span>
+                <!-- Right Side -->
 
-                </button>
+                <div class="navbar-right">
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-                    <ul class="navbar-nav flex-grow-1">
+                    <!-- Login -->
+
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn btn-outline-primary login-btn">
+
+                        Login
+
+                    </a>
+
+
+                    <!-- Sign Up -->
+
+                    <a asp-controller="Account"
+                       asp-action="Register"
+                       class="btn btn-primary signup-btn">
+
+                        Sign Up
+
+                    </a>
+
+
+                    <!-- Hamburger -->
+
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mainMenu"
+                            aria-controls="mainMenu"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+
+                        <span class="navbar-toggler-icon"></span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- Menu -->
+
+                <div class="navbar-collapse collapse"
+                     id="mainMenu">
+
+                    <ul class="navbar-nav">
+
 
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-controller="Home"
                                asp-action="Index">
+
                                 Home
+
                             </a>
+
                         </li>
 
+
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-controller="Dashboard"
                                asp-action="Index">
+
                                 Dashboard
+
                             </a>
+
                         </li>
 
+
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-controller="Expenses"
                                asp-action="Index">
+
                                 Expenses
+
                             </a>
+
                         </li>
 
+
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-controller="Profile"
                                asp-action="Index">
+
                                 Profile
+
                             </a>
+
                         </li>
+
 
                     </ul>
 
@@ -93,6 +164,7 @@
 
     </header>
 
+
     <div class="container">
 
         <main role="main" class="pb-3">
@@ -103,13 +175,17 @@
 
     </div>
 
+
     <footer class="border-top footer text-muted">
 
         <div class="container">
+
             &copy; 2026 - SmartExpenseManager
+
         </div>
 
     </footer>
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
