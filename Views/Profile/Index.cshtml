@@ -1,63 +1,116 @@
+@model SmartExpenseManager.Controllers.ProfileViewModel
 @{
     ViewData["Title"] = "Profile";
+    var hasAvatar = !string.IsNullOrEmpty(Model.AvatarUrl);
 }
 
-<div class="container mt-4">
+<style>
+    .pf { --pf-accent:#7c6cf0; --pf-accent-soft:#f1effe; --pf-border:#e6e6ef; --pf-muted:#6b6b80;
+          max-width: 720px; margin: 0 auto; padding: 0 .5rem; }
+    .pf h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 1rem; }
+    .pf-card { background:#fff; border:1px solid var(--pf-border); border-radius:14px;
+               padding:1.25rem; box-shadow:0 1px 3px rgba(20,20,50,.05); margin-bottom:1rem; }
+    .pf-head { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .pf-avatar { position:relative; width:84px; height:84px; flex:0 0 84px; border-radius:50%;
+                 overflow:hidden; background:var(--pf-accent-soft); border:2px solid #fff;
+                 box-shadow:0 0 0 1px var(--pf-border); }
+    .pf-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .pf-initial { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                  font-size:2rem; font-weight:600; color:var(--pf-accent); }
+    .pf-who { flex:1 1 200px; min-width:0; }
+    .pf-who strong { display:block; font-size:1.1rem; overflow-wrap:anywhere; }
+    .pf-who span { color:var(--pf-muted); font-size:.9rem; overflow-wrap:anywhere; }
+    .pf-actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.75rem; align-items:center; }
+    .pf-btn { background:var(--pf-accent); color:#fff; border:0; border-radius:8px;
+              padding:.5rem 1rem; font-weight:500; cursor:pointer; }
+    .pf-btn:hover { filter:brightness(.95); }
+    .pf-btn-outline { background:#fff; color:var(--pf-accent); border:1px solid var(--pf-accent); }
+    .pf label { font-size:.85rem; color:var(--pf-muted); margin-bottom:.25rem; display:block; }
+    .pf input.form-control { border-radius:8px; border-color:var(--pf-border); }
+    .pf input.form-control:focus { border-color:var(--pf-accent); box-shadow:0 0 0 .2rem rgba(124,108,240,.2); }
+    .pf-hint { font-size:.8rem; color:var(--pf-muted); }
+    @@media (max-width:480px){ .pf-card{padding:1rem;} .pf-btn{width:100%;} }
+</style>
 
-    <div class="mb-4">
-        <h1>My Profile</h1>
-        <p class="text-muted">Manage your account information.</p>
+<div class="pf">
+    <h1>Profile</h1>
+
+    @if (TempData["Success"] is string ok)
+    { <div class="alert alert-success py-2" role="alert">@ok</div> }
+    @if (TempData["Error"] is string err)
+    { <div class="alert alert-danger py-2" role="alert">@err</div> }
+
+    <div class="pf-card">
+        <div class="pf-head">
+            <div class="pf-avatar">
+                @if (hasAvatar)
+                {
+                    <img id="pfImg" src="@Model.AvatarUrl" alt="Profile photo" referrerpolicy="no-referrer" />
+                }
+                else
+                {
+                    <img id="pfImg" alt="Profile photo" hidden />
+                }
+                <span id="pfInitial" class="pf-initial" @(hasAvatar ? "hidden" : null)>@Model.Initial</span>
+            </div>
+            <div class="pf-who">
+                <strong>@(string.IsNullOrWhiteSpace(Model.FullName) ? "Your name" : Model.FullName)</strong>
+                <span>@Model.Email</span>
+
+                <form asp-action="UploadPhoto" method="post" enctype="multipart/form-data" class="pf-actions" id="photoForm">
+                    @Html.AntiForgeryToken()
+                    <input type="file" id="photoInput" name="photo" accept="image/jpeg,image/png,image/webp" hidden />
+                    <button type="button" class="pf-btn pf-btn-outline" id="changePhotoBtn">Change photo</button>
+                    <button type="submit" class="pf-btn" id="uploadBtn" hidden>Upload photo</button>
+                    <span class="pf-hint" id="photoMsg">JPG, PNG or WebP, up to 2 MB</span>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-4 shadow-sm mb-4">
-
-        <h4>@ViewBag.FullName</h4>
-
-        <p class="text-muted mb-1">
-            @ViewBag.Email
-        </p>
-
-        <p class="text-muted">
-            Login method: @ViewBag.Provider
-        </p>
-
-        <hr />
-
-        <form asp-action="UpdateName" method="post">
-
+    <div class="pf-card">
+        <form asp-action="UpdateName" method="post" novalidate>
             <div class="mb-3">
-                <label class="form-label">Name</label>
-
-                <input type="text"
-                       name="fullName"
-                       value="@ViewBag.FullName"
-                       class="form-control" />
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" class="form-control" maxlength="100" autocomplete="name" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
             </div>
-
-            <button type="submit" class="btn btn-primary">
-                Update Name
-            </button>
-
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <input id="email" class="form-control" value="@Model.Email" readonly disabled />
+                <div class="pf-hint mt-1">Your email comes from your sign-in account and can't be changed here.</div>
+            </div>
+            <button type="submit" class="pf-btn">Save changes</button>
         </form>
-
     </div>
-
-    <div class="row g-3">
-
-        <div class="col-md-6">
-            <div class="card p-4 shadow-sm">
-                <h6>Total Spent</h6>
-                <h3>₹@ViewBag.TotalExpenses</h3>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card p-4 shadow-sm">
-                <h6>Total Transactions</h6>
-                <h3>@ViewBag.TransactionCount</h3>
-            </div>
-        </div>
-
-    </div>
-
 </div>
+
+@section Scripts {
+<script>
+(function () {
+    var img = document.getElementById('pfImg');
+    var initial = document.getElementById('pfInitial');
+    var input = document.getElementById('photoInput');
+    var msg = document.getElementById('photoMsg');
+    var uploadBtn = document.getElementById('uploadBtn');
+
+    // If the photo link is broken, show the initial instead.
+    img.addEventListener('error', function () { img.hidden = true; initial.hidden = false; });
+
+    document.getElementById('changePhotoBtn').addEventListener('click', function () { input.click(); });
+
+    input.addEventListener('change', function () {
+        var f = input.files[0];
+        if (!f) return;
+        var okTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (okTypes.indexOf(f.type) === -1) { msg.textContent = 'Please choose a JPG, PNG or WebP image.'; input.value = ''; uploadBtn.hidden = true; return; }
+        if (f.size > 2 * 1024 * 1024) { msg.textContent = 'That photo is over 2 MB.'; input.value = ''; uploadBtn.hidden = true; return; }
+        var reader = new FileReader();
+        reader.onload = function (e) { img.src = e.target.result; img.hidden = false; initial.hidden = true; };
+        reader.readAsDataURL(f);
+        msg.textContent = f.name + ' selected. Click "Upload photo" to save it.';
+        uploadBtn.hidden = false;
+    });
+})();
+</script>
+}

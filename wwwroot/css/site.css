@@ -1,14 +1,19 @@
-/* =========================================
-   Smart Expense Manager
-   Modern Clean Dashboard
-   ========================================= */
 
+/*  Smart Expense Manager
+   Responsive Modern Dashboard */
 
 /* ---------- Basic Page ---------- */
 
 html {
     font-size: 14px;
     min-height: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 body {
@@ -18,16 +23,29 @@ body {
     background: #f7f8fc;
     color: #1f2937;
     font-family: Arial, Helvetica, sans-serif;
+    overflow-wrap: break-word;
 }
-
 
 /* ---------- Main Content ---------- */
 
 main {
+    width: 100%;
+    min-width: 0;
     min-height: 75vh;
     padding-bottom: 40px;
 }
 
+/* Keep Bootstrap containers fluid without exceeding the screen */
+.container,
+.container-fluid {
+    min-width: 0;
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+}
 
 /* ---------- Navbar ---------- */
 
@@ -37,16 +55,82 @@ main {
     border-bottom: 1px solid #e5e7eb !important;
 }
 
-.navbar-brand {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827 !important;
+.navbar-main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
 }
 
+/* ---------- Logo and Website Name ---------- */
+
+.navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    margin-right: 0;
+    color: #111827 !important;
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.expense-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    background: #eef0f7;
+    color: #2563eb;
+    border: 1px solid #c7cbd9;
+    border-radius: 10px;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.website-name {
+    min-width: 0;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ---------- Navbar Right Side ---------- */
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.login-btn,
+.signup-btn {
+    padding: 7px 16px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.navbar-toggler {
+    flex-shrink: 0;
+    margin-left: 2px;
+    padding: 6px 9px;
+    border-radius: 8px;
+}
+
+/* ---------- Navigation Menu ---------- */
+
 .nav-link {
+    margin-left: 12px;
     color: #4b5563 !important;
     font-weight: 500;
-    margin-left: 12px;
     transition: color 0.2s ease;
 }
 
@@ -54,6 +138,21 @@ main {
     color: #2563eb !important;
 }
 
+#mainMenu {
+    flex-basis: 100%;
+    width: 100%;
+    min-width: 0;
+}
+
+#mainMenu .navbar-nav {
+    padding-top: 10px;
+    padding-bottom: 4px;
+}
+
+#mainMenu .nav-link {
+    margin-left: 0;
+    padding: 8px 0;
+}
 
 /* ---------- Headings ---------- */
 
@@ -67,35 +166,43 @@ h6 {
     font-weight: 700;
 }
 
+h1 {
+    overflow-wrap: anywhere;
+}
 
 /* ---------- Main Cards ---------- */
 
 .card {
+    min-width: 0;
     background: #f7f4fc;
     border: 1px solid #e8e1f2;
     border-radius: 14px;
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
-    transition: transform 0.2s ease,
-                box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
+/* Hover effects only on devices with a real mouse */
+@media (hover: hover) and (pointer: fine) {
+    .card:hover {
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
+    }
 }
-
 
 /* ---------- Table Container ---------- */
 
 .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: #ffffff;
     border: 1px solid #dfe3eb;
     border-radius: 10px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
-
-/* ---------- Table ---------- */
+/* ---------- Tables ---------- */
 
 .table {
     width: 100%;
@@ -105,9 +212,6 @@ h6 {
     border-spacing: 0;
 }
 
-
-/* Table Header */
-
 .table thead th {
     background: #fafbfc;
     color: #475569;
@@ -115,10 +219,8 @@ h6 {
     font-weight: 600;
     padding: 14px 12px;
     border-bottom: 1px solid #dfe3eb;
+    vertical-align: middle; 
 }
-
-
-/* Table Rows */
 
 .table tbody td {
     padding: 14px 12px;
@@ -126,20 +228,20 @@ h6 {
     border-bottom: 1px solid #e5e7eb;
 }
 
-
-/* Remove line from last row */
-
 .table tbody tr:last-child td {
     border-bottom: none;
 }
 
-
-/* Slight row hover */
-
-.table tbody tr:hover {
-    background: #faf9fd;
+.table td,
+.table th {
+    overflow-wrap: normal;
 }
 
+/* Keep action buttons readable */
+.table .btn {
+    white-space: nowrap;
+    margin: 2px 0;
+}
 
 /* ---------- Buttons ---------- */
 
@@ -147,7 +249,7 @@ h6 {
     border-radius: 8px;
     font-weight: 500;
     padding: 9px 18px;
-    transition: 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-primary {
@@ -180,11 +282,13 @@ h6 {
     border-radius: 8px;
 }
 
-
 /* ---------- Forms ---------- */
 
 .form-control,
 .form-select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: #ffffff;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -197,15 +301,15 @@ h6 {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-
-/* ---------- Text ---------- */
+/* ---------- Text and Links ---------- */
 
 .text-muted {
     color: #64748b !important;
 }
 
-
-/* ---------- Links ---------- */
+.text-danger {
+    font-size: 14px;
+}
 
 a {
     color: #2563eb;
@@ -215,7 +319,6 @@ a {
 a:hover {
     color: #1d4ed8;
 }
-
 
 /* ---------- Footer ---------- */
 
@@ -233,24 +336,28 @@ footer .container {
     color: #64748b;
 }
 
-
-/* ---------- Validation ---------- */
-
-.text-danger {
-    font-size: 14px;
-}
-
-
-/* ---------- Mobile ---------- */
+/* =========================================
+   Tablet and Smaller Windows
+   ========================================= */
 
 @media (max-width: 768px) {
-
     .navbar {
         padding: 12px 0;
     }
 
     .navbar-brand {
         font-size: 18px;
+    }
+
+    .website-name {
+        font-size: 18px;
+    }
+
+    .expense-logo {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
     }
 
     .nav-link {
@@ -267,187 +374,11 @@ footer .container {
     }
 
     h1 {
-        font-size: 32px;
+        font-size: 30px;
     }
 
     .table-responsive {
         border-radius: 8px;
-    }
-}
-
-/* Smart Expense Manager Logo */
-
-.expense-logo {
-    width: 38px;
-    height: 38px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #EEF0F7;
-    color: #2563EB;
-
-    border: 1px solid #C7CBD9;
-    border-radius: 10px;
-
-    font-size: 21px;
-    font-weight: 700;
-}
-
-
-/* Login button */
-
-.login-btn {
-    border-radius: 8px;
-    padding: 7px 16px;
-}
-
-
-/* Sign Up button */
-
-.signup-btn {
-    border-radius: 8px;
-    padding: 7px 16px;
-}
-
-
-/* Small screens */
-
-@media (max-width: 576px) {
-
-    .expense-logo {
-        width: 34px;
-        height: 34px;
-        font-size: 18px;
-    }
-
-    .navbar-brand {
-        font-size: 16px;
-    }
-
-    .login-btn,
-    .signup-btn {
-        padding: 6px 10px;
-        font-size: 13px;
-    }
-
-}
-
-/* =========================================
-   Responsive Navbar
-   Desktop → Tablet → Mobile
-   ========================================= */
-
-.navbar-main {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    min-height: 58px;
-}
-
-
-/* Logo */
-
-.expense-logo {
-    width: 38px;
-    height: 38px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #EEF0F7;
-    color: #2563EB;
-
-    border: 1px solid #C7CBD9;
-    border-radius: 10px;
-
-    font-size: 21px;
-    font-weight: 700;
-
-    flex-shrink: 0;
-}
-
-
-/* Website name */
-
-.website-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-    white-space: nowrap;
-}
-
-
-/* Right side */
-
-.navbar-right {
-    margin-left: auto;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    flex-shrink: 0;
-}
-
-
-/* Login */
-
-.login-btn,
-.signup-btn {
-    border-radius: 8px;
-    padding: 7px 16px;
-
-    white-space: nowrap;
-}
-
-
-/* Hamburger */
-
-.navbar-toggler {
-    margin-left: 2px;
-    padding: 6px 9px;
-
-    border-radius: 8px;
-}
-
-
-/* Menu */
-
-#mainMenu {
-    width: 100%;
-    flex-basis: 100%;
-}
-
-#mainMenu .navbar-nav {
-    padding-top: 10px;
-    padding-bottom: 4px;
-}
-
-#mainMenu .nav-link {
-    margin-left: 0;
-    padding: 8px 0;
-}
-
-
-/* =========================================
-   Tablet
-   ========================================= */
-
-@media (max-width: 768px) {
-
-    .website-name {
-        font-size: 18px;
-    }
-
-    .expense-logo {
-        width: 36px;
-        height: 36px;
-        font-size: 20px;
     }
 
     .login-btn,
@@ -455,22 +386,19 @@ footer .container {
         padding: 7px 12px;
         font-size: 14px;
     }
-
 }
 
-
 /* =========================================
-   Small phones
+   Mobile Phones
    ========================================= */
 
 @media (max-width: 576px) {
-
     .navbar {
         padding: 10px 0;
     }
 
     .navbar-main {
-        min-height: 50px;
+        gap: 5px;
     }
 
     .website-name {
@@ -478,6 +406,7 @@ footer .container {
     }
 
     .expense-logo {
+        flex-basis: 32px;
         width: 32px;
         height: 32px;
         font-size: 17px;
@@ -502,23 +431,46 @@ footer .container {
         padding: 5px 7px;
     }
 
+    h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+    }
+
+    footer {
+        padding: 16px 0;
+        margin-top: 24px;
+    }
 }
 
-
 /* =========================================
-   Very small phones
+   Very Narrow Screens
    ========================================= */
 
 @media (max-width: 400px) {
-
     .website-name {
         font-size: 13px;
     }
 
     .expense-logo {
+        flex-basis: 29px;
         width: 29px;
         height: 29px;
         font-size: 15px;
+    }
+
+    .navbar-brand .ms-2 {
+        margin-left: 5px !important;
+    }
+
+    .navbar-right {
+        gap: 4px;
     }
 
     .login-btn,
@@ -531,4 +483,7 @@ footer .container {
         padding: 4px 6px;
     }
 
+    h1 {
+        font-size: 23px;
+    }
 }
