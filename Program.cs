@@ -1,5 +1,3 @@
-
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -54,6 +52,9 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
         options.ClientSecret = googleClientSecret;
         options.SignInScheme = IdentityConstants.ExternalScheme;
 
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
         options.AuthorizationEndpoint =
             "https://accounts.google.com/o/oauth2/v2/auth";
 
@@ -69,15 +70,7 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
         options.Scope.Add("email");
         options.Scope.Add("profile");
 
-        options.ClaimActions.MapJsonKey(
-            ClaimTypes.NameIdentifier, "sub");
-
-        options.ClaimActions.MapJsonKey(
-            ClaimTypes.Name, "name");
-
-        options.ClaimActions.MapJsonKey(
-            ClaimTypes.Email, "email");
-
+       
         options.Events.OnCreatingTicket = async context =>
         {
             using var request = new HttpRequestMessage(
@@ -98,8 +91,21 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
                 await response.Content.ReadAsStringAsync(
                     context.HttpContext.RequestAborted));
 
-            context.RunClaimActions(user.RootElement);
+            var root = user.RootElement;
+
+            if (root.TryGetProperty("sub", out var sub))
+                context.Identity!.AddClaim(
+                    new Claim(ClaimTypes.NameIdentifier, sub.GetString()!));
+
+            if (root.TryGetProperty("name", out var name))
+                context.Identity!.AddClaim(
+                    new Claim(ClaimTypes.Name, name.GetString()!));
+
+            if (root.TryGetProperty("email", out var email))
+                context.Identity!.AddClaim(
+                    new Claim(ClaimTypes.Email, email.GetString()!));
         };
+        
     });
 }
 
