@@ -4,3 +4,9 @@ obj/
 *.user
 appsettings.Development.json
 appsettings.json
+
+# Ignore all Markdown files
+*.md
+
+# But keep README.md
+!README.md

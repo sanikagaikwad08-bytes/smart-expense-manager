@@ -23,195 +23,68 @@ namespace SmartExpenseManager.Controllers
             _config = config;
         }
 
-        private bool ProviderEnabled(string provider)
-        {
-            return !string.IsNullOrWhiteSpace(
-                       _config[$"Authentication:{provider}:ClientId"])
-                   && !string.IsNullOrWhiteSpace(
-                       _config[$"Authentication:{provider}:ClientSecret"]);
-        }
-
-        // ---------------- REGISTER ----------------
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            SetProviderFlags();
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(
-            string username,
-            string password,
-            string confirmPassword)
-        {
-            SetProviderFlags();
-
-            if (string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(password))
-            {
-                ModelState.AddModelError(
-                    "", "Please enter a username and password.");
-                return View();
-            }
-
-            if (password != confirmPassword)
-            {
-                ModelState.AddModelError(
-                    "", "Passwords do not match.");
-                return View();
-            }
-
-            if (await _userManager.FindByNameAsync(username) != null)
-            {
-                ModelState.AddModelError(
-                    "", "This username is already taken.");
-                return View();
-            }
-
-            var user = new ApplicationUser
-            {
-                UserName = username,
-                FullName = username,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: true);
-                return RedirectToAction("Index", "Dashboard");
-            }
-
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-
-            return View();
-        }
-
-        // ---------------- LOGIN ----------------
-
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
-            SetProviderFlags();
             ViewBag.ReturnUrl = returnUrl;
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(
-            string username,
-            string password,
-            bool rememberMe = false,
-            string? returnUrl = null)
-        {
-            SetProviderFlags();
-            ViewBag.ReturnUrl = returnUrl;
-
-            var user = await _userManager.FindByNameAsync(username);
-
-            if (user == null)
-            {
-                ModelState.AddModelError(
-                    "", "Invalid username or password.");
-                return View();
-            }
-
-            var result = await _signInManager.PasswordSignInAsync(
-                user, password, rememberMe, lockoutOnFailure: false);
-
-            if (result.Succeeded)
-                return SafeRedirect(returnUrl);
-
-            ModelState.AddModelError(
-                "", "Invalid username or password.");
+            ViewBag.GoogleEnabled =
+                !string.IsNullOrWhiteSpace(
+                    _config["Authentication:Google:ClientId"])
+                && !string.IsNullOrWhiteSpace(
+                    _config["Authentication:Google:ClientSecret"]);
 
             return View();
         }
 
-        // ---------------- LOGOUT ----------------
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        [HttpGet]
+        public IActionResult Register(string? returnUrl = null)
         {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Login), new { returnUrl });
         }
-
-        // ---------------- GOOGLE ----------------
 
         [HttpGet]
         public IActionResult GoogleLogin(string? returnUrl = null)
         {
-            return StartExternalLogin("Google", returnUrl);
-        }
+            var clientId = _config["Authentication:Google:ClientId"];
+            var clientSecret = _config["Authentication:Google:ClientSecret"];
 
-        // ---------------- GITHUB ----------------
-
-        [HttpGet]
-        public IActionResult GitHubLogin(string? returnUrl = null)
-        {
-            return StartExternalLogin("GitHub", returnUrl);
-        }
-
-        // Start the provider's OAuth flow.
-        private IActionResult StartExternalLogin(
-            string provider,
-            string? returnUrl)
-        {
-            if (!ProviderEnabled(provider))
+            if (string.IsNullOrWhiteSpace(clientId) ||
+                string.IsNullOrWhiteSpace(clientSecret))
             {
-                return Content(
-                    $"{provider} sign-in is not configured. Check your authentication settings.");
+                return StatusCode(
+                    500,
+                    "Google sign-in is not configured. Check the app's environment settings.");
             }
 
             if (!Url.IsLocalUrl(returnUrl))
                 returnUrl = null;
 
             var callbackUrl = Url.Action(
-                provider + "Response",
+                nameof(GoogleResponse),
                 "Account",
                 new { returnUrl });
 
             var properties =
                 _signInManager.ConfigureExternalAuthenticationProperties(
-                    provider, callbackUrl);
+                    "Google", callbackUrl);
 
-            return Challenge(properties, provider);
-        }
-
-        // Both providers return here after OAuth completes.
-        [HttpGet]
-        public Task<IActionResult> GoogleResponse(string? returnUrl = null)
-        {
-            return CompleteExternalLogin(returnUrl);
+            return Challenge(properties, "Google");
         }
 
         [HttpGet]
-        public Task<IActionResult> GitHubResponse(string? returnUrl = null)
-        {
-            return CompleteExternalLogin(returnUrl);
-        }
-
-        private async Task<IActionResult> CompleteExternalLogin(
-            string? returnUrl)
+        public async Task<IActionResult> GoogleResponse(
+            string? returnUrl = null)
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
-            if (info == null)
+            if (info == null || info.LoginProvider != "Google")
             {
                 TempData["Error"] =
-                    "External sign-in failed. Please try again.";
-                return RedirectToAction("Login");
+                    "Google sign-in did not complete. Please try again.";
+
+                return RedirectToAction(nameof(Login));
             }
 
-            // Sign in if this provider is already linked to the user.
             var signInResult =
                 await _signInManager.ExternalLoginSignInAsync(
                     info.LoginProvider,
@@ -227,8 +100,9 @@ namespace SmartExpenseManager.Controllers
             if (string.IsNullOrWhiteSpace(email))
             {
                 TempData["Error"] =
-                    "The provider did not return an email address. Verify your email settings and try again.";
-                return RedirectToAction("Login");
+                    "Google did not provide an email address. Please try again.";
+
+                return RedirectToAction(nameof(Login));
             }
 
             var user = await _userManager.FindByEmailAsync(email);
@@ -239,9 +113,8 @@ namespace SmartExpenseManager.Controllers
                 {
                     UserName = email,
                     Email = email,
-                    FullName = string.IsNullOrWhiteSpace(name)
-                        ? email
-                        : name,
+                    FullName = string.IsNullOrWhiteSpace(name) ? email : name,
+                    EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -250,28 +123,33 @@ namespace SmartExpenseManager.Controllers
                 if (!createResult.Succeeded)
                 {
                     TempData["Error"] =
-                        "Could not create your account: " +
-                        string.Join(" ", createResult.Errors.Select(
-                            e => e.Description));
+                        "Could not create your account. Please try again.";
 
-                    return RedirectToAction("Login");
+                    return RedirectToAction(nameof(Login));
                 }
             }
 
-            // Link the external provider to the account.
             var addLoginResult = await _userManager.AddLoginAsync(user, info);
 
             if (!addLoginResult.Succeeded)
             {
                 TempData["Error"] =
-                    "Could not link this external account. Try signing in with the original provider.";
+                    "Could not connect your Google account. Please try again.";
 
-                return RedirectToAction("Login");
+                return RedirectToAction(nameof(Login));
             }
 
             await _signInManager.SignInAsync(user, isPersistent: true);
 
             return SafeRedirect(returnUrl);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
 
         private IActionResult SafeRedirect(string? returnUrl)
@@ -283,12 +161,6 @@ namespace SmartExpenseManager.Controllers
             }
 
             return RedirectToAction("Index", "Dashboard");
-        }
-
-        private void SetProviderFlags()
-        {
-            ViewBag.GoogleEnabled = ProviderEnabled("Google");
-            ViewBag.GitHubEnabled = ProviderEnabled("GitHub");
         }
     }
 }

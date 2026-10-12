@@ -1,6 +1,10 @@
 
-/*  Smart Expense Manager
-   Responsive Modern Dashboard */
+/* =========================================
+   SMART EXPENSE MANAGER
+   Responsive Modern Dashboard
+   Blue, White and Lavender Theme
+   ========================================= */
+
 
 /* ---------- Basic Page ---------- */
 
@@ -8,6 +12,7 @@ html {
     font-size: 14px;
     min-height: 100%;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
 }
 
 *,
@@ -26,6 +31,20 @@ body {
     overflow-wrap: break-word;
 }
 
+img,
+svg,
+video {
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
 /* ---------- Main Content ---------- */
 
 main {
@@ -35,17 +54,11 @@ main {
     padding-bottom: 40px;
 }
 
-/* Keep Bootstrap containers fluid without exceeding the screen */
 .container,
 .container-fluid {
     min-width: 0;
 }
 
-img,
-svg,
-video {
-    max-width: 100%;
-}
 
 /* ---------- Navbar ---------- */
 
@@ -64,6 +77,7 @@ video {
     min-width: 0;
     gap: 8px;
 }
+
 
 /* ---------- Logo and Website Name ---------- */
 
@@ -101,6 +115,7 @@ video {
     white-space: nowrap;
 }
 
+
 /* ---------- Navbar Right Side ---------- */
 
 .navbar-right {
@@ -124,6 +139,7 @@ video {
     padding: 6px 9px;
     border-radius: 8px;
 }
+
 
 /* ---------- Navigation Menu ---------- */
 
@@ -154,6 +170,7 @@ video {
     padding: 8px 0;
 }
 
+
 /* ---------- Headings ---------- */
 
 h1,
@@ -168,25 +185,57 @@ h6 {
 
 h1 {
     overflow-wrap: anywhere;
+    letter-spacing: -0.4px;
 }
+
+h2 {
+    letter-spacing: -0.3px;
+}
+
 
 /* ---------- Main Cards ---------- */
 
 .card {
     min-width: 0;
-    background: #f7f4fc;
-    border: 1px solid #e8e1f2;
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+    background: #ffffff;
+    border: 1px solid #e8eaf2;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(31, 41, 55, 0.05) !important;
     transition: box-shadow 0.2s ease;
 }
 
-/* Hover effects only on devices with a real mouse */
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid #eceef4;
+}
+
+.card-body {
+    min-width: 0;
+}
+
+/* Hover effects only on mouse devices */
 @media (hover: hover) and (pointer: fine) {
     .card:hover {
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
+        box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08) !important;
     }
 }
+
+
+/* ---------- Layout Safety ---------- */
+
+.row > *,
+[class*="col-"] {
+    min-width: 0;
+}
+
+.text-break {
+    overflow-wrap: anywhere;
+}
+
+.text-truncate {
+    min-width: 0;
+}
+
 
 /* ---------- Table Container ---------- */
 
@@ -200,7 +249,9 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
 }
+
 
 /* ---------- Tables ---------- */
 
@@ -219,7 +270,8 @@ h1 {
     font-weight: 600;
     padding: 14px 12px;
     border-bottom: 1px solid #dfe3eb;
-    vertical-align: middle; 
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .table tbody td {
@@ -243,23 +295,39 @@ h1 {
     margin: 2px 0;
 }
 
+/* Tables inside responsive containers can scroll */
+.table-responsive .table {
+    min-width: 560px;
+}
+
+
 /* ---------- Buttons ---------- */
 
 .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
     border-radius: 8px;
     font-weight: 500;
     padding: 9px 18px;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .btn-primary {
     background: #2563eb;
     border-color: #2563eb;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
     background: #1d4ed8;
     border-color: #1d4ed8;
+    color: #ffffff;
 }
 
 .btn-outline-primary {
@@ -282,24 +350,62 @@ h1 {
     border-radius: 8px;
 }
 
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
 /* ---------- Forms ---------- */
+
+.form-label {
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
 
 .form-control,
 .form-select {
+    display: block;
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    min-height: 44px;
     background: #ffffff;
     border: 1px solid #d1d5db;
     border-radius: 8px;
     padding: 10px 12px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
 }
 
 .form-control:focus,
 .form-select:focus {
-    border-color: #2563eb;
+    border-color: #6489f5;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
+
+.form-control::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
 
 /* ---------- Text and Links ---------- */
 
@@ -320,6 +426,53 @@ a:hover {
     color: #1d4ed8;
 }
 
+p {
+    line-height: 1.6;
+}
+
+
+/* ---------- Alerts ---------- */
+
+.alert {
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+
+.alert-danger {
+    color: #991b1b;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.alert-success {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+
+/* ---------- Dashboard Statistics ---------- */
+
+.stat-card {
+    height: 100%;
+    padding: 20px;
+}
+
+.stat-card .stat-label {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.stat-card .stat-value {
+    margin-top: 8px;
+    color: #111827;
+    font-size: 28px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+
 /* ---------- Footer ---------- */
 
 footer {
@@ -336,8 +489,107 @@ footer .container {
     color: #64748b;
 }
 
+
 /* =========================================
-   Tablet and Smaller Windows
+   LOGIN AND REGISTRATION PAGES
+   ========================================= */
+
+.auth-page {
+    width: 100%;
+    max-width: 520px;
+    margin: 48px auto;
+    padding: 0 16px;
+}
+
+.auth-card {
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e7e9f2;
+    border-radius: 20px;
+    box-shadow: 0 12px 36px rgba(31, 41, 55, 0.08) !important;
+}
+
+.auth-card h1,
+.auth-card h2 {
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+    margin-bottom: 26px;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.google-login-btn {
+    width: 100%;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #1f2937;
+    background: #ffffff;
+    border: 1px solid #d5d9e3;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.google-login-btn img {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
+.google-login-btn:hover {
+    color: #111827;
+    background: #f8faff;
+    border-color: #aebce5;
+    box-shadow: 0 3px 10px rgba(31, 41, 55, 0.06);
+}
+
+.auth-footer {
+    margin-top: 24px;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.auth-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+}
+
+
+/* ---------- Keyboard Accessibility ---------- */
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 3px;
+}
+
+
+/* =========================================
+   TABLET AND SMALLER WINDOWS
    ========================================= */
 
 @media (max-width: 768px) {
@@ -370,7 +622,7 @@ footer .container {
     }
 
     .card {
-        border-radius: 12px;
+        border-radius: 14px;
     }
 
     h1 {
@@ -386,10 +638,15 @@ footer .container {
         padding: 7px 12px;
         font-size: 14px;
     }
+
+    .auth-page {
+        margin-top: 32px;
+    }
 }
 
+
 /* =========================================
-   Mobile Phones
+   MOBILE PHONES
    ========================================= */
 
 @media (max-width: 576px) {
@@ -435,12 +692,47 @@ footer .container {
         font-size: 26px;
     }
 
+    h2 {
+        font-size: 22px;
+    }
+
     .card {
-        border-radius: 10px;
+        border-radius: 12px;
+    }
+
+    .card-body {
+        padding: 16px;
     }
 
     .btn {
         padding: 8px 12px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 24px;
+    }
+
+    .table-responsive .table {
+        min-width: 520px;
+    }
+
+    .auth-page {
+        margin: 24px auto;
+        padding: 0 12px;
+    }
+
+    .auth-card {
+        padding: 24px 18px;
+        border-radius: 15px;
+    }
+
+    .auth-card h1,
+    .auth-card h2 {
+        font-size: 24px;
     }
 
     footer {
@@ -449,8 +741,9 @@ footer .container {
     }
 }
 
+
 /* =========================================
-   Very Narrow Screens
+   VERY NARROW SCREENS
    ========================================= */
 
 @media (max-width: 400px) {
@@ -485,5 +778,28 @@ footer .container {
 
     h1 {
         font-size: 23px;
+    }
+
+    .auth-card {
+        padding: 22px 15px;
+    }
+}
+
+
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
