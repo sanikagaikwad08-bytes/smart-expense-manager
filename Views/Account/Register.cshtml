@@ -1,43 +1,15 @@
 
 @{
-    ViewData["Title"] = "Sign Up";
+    ViewData["Title"] = "Create Account";
 }
 
-<div class="auth-page">
-    <div class="auth-card">
+<div class="container mt-5 text-center">
+    <h2>Create your account</h2>
+    <p>Sign up or log in using the same Google button.</p>
 
-        <h2>Create Your Account</h2>
-
-        <p class="auth-subtitle">
-            Start managing your expenses with Smart Expense Manager
-        </p>
-
-        @if (TempData["Error"] != null)
-        {
-            <div class="auth-error" role="alert">
-                @TempData["Error"]
-            </div>
-        }
-
-        <a asp-controller="Account"
-           asp-action="GoogleLogin"
-           class="google-login-btn">
-
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                 alt=""
-                 width="20"
-                 height="20" />
-
-            <span>Continue with Google</span>
-        </a>
-
-        <p class="auth-footer">
-            Already have an account?
-            <a asp-controller="Account"
-               asp-action="Login">
-                Sign in
-            </a>
-        </p>
-
-    </div>
+    <a asp-controller="Account"
+       asp-action="GoogleLogin"
+       class="btn btn-outline-dark">
+        Continue with Google
+    </a>
 </div>

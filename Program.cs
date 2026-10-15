@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -33,8 +34,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/Login";
 });
 
-// Google credentials come from User Secrets locally
-// and environment variables on Render.
 var googleClientId =
     builder.Configuration["Authentication:Google:ClientId"];
 
@@ -53,7 +52,8 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
         options.SignInScheme = IdentityConstants.ExternalScheme;
 
         options.CorrelationCookie.SameSite = SameSiteMode.None;
-        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.CorrelationCookie.SecurePolicy =
+            CookieSecurePolicy.Always;
 
         options.AuthorizationEndpoint =
             "https://accounts.google.com/o/oauth2/v2/auth";
@@ -70,7 +70,6 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
         options.Scope.Add("email");
         options.Scope.Add("profile");
 
-       
         options.Events.OnCreatingTicket = async context =>
         {
             using var request = new HttpRequestMessage(
@@ -95,21 +94,25 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
 
             if (root.TryGetProperty("sub", out var sub))
                 context.Identity!.AddClaim(
-                    new Claim(ClaimTypes.NameIdentifier, sub.GetString()!));
+                    new Claim(
+                        ClaimTypes.NameIdentifier,
+                        sub.GetString()!));
 
             if (root.TryGetProperty("name", out var name))
                 context.Identity!.AddClaim(
-                    new Claim(ClaimTypes.Name, name.GetString()!));
+                    new Claim(
+                        ClaimTypes.Name,
+                        name.GetString()!));
 
             if (root.TryGetProperty("email", out var email))
                 context.Identity!.AddClaim(
-                    new Claim(ClaimTypes.Email, email.GetString()!));
+                    new Claim(
+                        ClaimTypes.Email,
+                        email.GetString()!));
         };
-        
     });
 }
 
-// Render / reverse-proxy headers
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders =
@@ -126,7 +129,19 @@ app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status500InternalServerError;
+
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync(
+                "Something went wrong. Please try again.");
+        });
+    });
+
     app.UseHsts();
 }
 

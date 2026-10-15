@@ -7,5 +7,8 @@ namespace SmartExpenseManager.Models
         public string? FullName { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public byte[]? ProfileImage { get; set; }
+        public string? ProfileImageContentType { get; set; }
     }
 }

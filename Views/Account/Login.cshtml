@@ -1,41 +1,36 @@
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Continue with Google";
 }
 
-<div class="auth-page">
-    <div class="auth-card">
+<div class="container mt-5" style="max-width: 420px;">
+    <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-2">Welcome</h2>
 
-        <h2>Welcome</h2>
-
-        <p class="auth-subtitle">
-            Sign in or create your Smart Expense Manager account
+        <p class="text-center text-muted mb-4">
+            Sign in or create your account to access your profile.
         </p>
 
-        @if (TempData["Error"] != null)
+        @if (TempData["Error"] is string error)
         {
-            <div class="auth-error" role="alert">
-                @TempData["Error"]
-            </div>
+            <div class="alert alert-danger">@error</div>
         }
 
         <a asp-controller="Account"
            asp-action="GoogleLogin"
-           asp-route-returnUrl="@ViewBag.ReturnUrl"
-           class="google-login-btn">
-
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                 alt=""
-                 width="20"
-                 height="20" />
-
-            <span>Continue with Google</span>
+           class="btn btn-outline-dark w-100 py-2">
+            Continue with Google
         </a>
 
-        <p class="auth-footer">
-            New here? Your account will be created automatically
-            the first time you sign in with Google.
+        <p class="text-center text-muted mt-3 mb-0">
+            New here? Your account will be created automatically.
         </p>
 
+        <div class="text-center mt-3">
+            <a asp-controller="Home"
+               asp-action="Index">
+                Back to home
+            </a>
+        </div>
     </div>
 </div>

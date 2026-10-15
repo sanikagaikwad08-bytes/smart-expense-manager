@@ -202,6 +202,12 @@ namespace SmartExpenseManager.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<byte[]>("ProfileImage")
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ProfileImageContentType")
+                        .HasColumnType("text");
+
                     b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("text");
 
