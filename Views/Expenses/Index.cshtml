@@ -1,78 +1,96 @@
+
 @model IEnumerable<SmartExpenseManager.Models.Expense>
 
 @{
     ViewData["Title"] = "Expenses";
+    bool isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
             <h1>Expenses</h1>
-
-            <p class="text-muted">
-                Manage your daily expenses.
-            </p>
+            <p class="text-muted">Manage your daily expenses.</p>
         </div>
 
-        <a asp-action="Create"
-           class="btn btn-primary">
-            Add Expense
-        </a>
-
+        @if (isLoggedIn)
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                Add Expense
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn btn-primary">
+                Log in
+            </a>
+        }
     </div>
 
+    @if (!isLoggedIn)
+    {
+        <div class="alert alert-info">
+            <h5>Log in to manage your expenses</h5>
+            <p class="mb-0">
+                You can visit this page without an account.
+                Log in to view your personal expenses and add, edit, or delete them.
+            </p>
+        </div>
+    }
 
     <div class="card shadow-sm">
-
         <div class="card-body">
 
             @if (!Model.Any())
             {
                 <div class="text-center py-5">
-
                     <h5>No expenses yet</h5>
 
-                    <p class="text-muted">
-                        Add your first expense to get started.
-                    </p>
+                    @if (isLoggedIn)
+                    {
+                        <p class="text-muted">
+                            Add your first expense to get started.
+                        </p>
 
-                    <a asp-action="Create"
-                       class="btn btn-primary">
-                        Add Expense
-                    </a>
-
+                        <a asp-action="Create" class="btn btn-primary">
+                            Add Expense
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            Your personal expenses will appear here after you log in.
+                        </p>
+                    }
                 </div>
             }
             else
             {
                 <div class="table-responsive">
-
                     <table class="table align-middle">
-
                         <thead>
-
                             <tr>
                                 <th>Category</th>
                                 <th>Description</th>
                                 <th>Amount</th>
                                 <th>Date</th>
                                 <th>Payment</th>
-                                <th>Actions</th>
-                            </tr>
 
+                                @if (isLoggedIn)
+                                {
+                                    <th>Actions</th>
+                                }
+                            </tr>
                         </thead>
 
                         <tbody>
-
                             @foreach (var expense in Model)
                             {
                                 <tr>
-
-                                    <td>
-                                        @expense.Category
-                                    </td>
+                                    <td>@expense.Category</td>
 
                                     <td>
                                         @(string.IsNullOrEmpty(expense.Description)
@@ -80,46 +98,38 @@
                                             : expense.Description)
                                     </td>
 
-                                    <td>
-                                        ₹@expense.Amount
-                                    </td>
+                                    <td>₹@expense.Amount</td>
 
                                     <td>
                                         @expense.ExpenseDate.ToString("dd MMM yyyy")
                                     </td>
 
-                                    <td>
-                                        @expense.PaymentMethod
-                                    </td>
+                                    <td>@expense.PaymentMethod</td>
 
-                                    <td>
+                                    @if (isLoggedIn)
+                                    {
+                                        <td>
+                                            <a asp-action="Edit"
+                                               asp-route-id="@expense.Id"
+                                               class="btn btn-sm btn-outline-primary me-2">
+                                                Edit
+                                            </a>
 
-                                        <a asp-action="Edit"
-                                           asp-route-id="@expense.Id"
-                                           class="btn btn-sm btn-outline-primary me-2">
-                                            Edit
-                                        </a>
-
-                                        <a asp-action="Delete"
-                                           asp-route-id="@expense.Id"
-                                           class="btn btn-sm btn-outline-danger">
-                                            Delete
-                                        </a>
-
-                                    </td>
-
+                                            <a asp-action="Delete"
+                                               asp-route-id="@expense.Id"
+                                               class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </a>
+                                        </td>
+                                    }
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
 
         </div>
-
     </div>
 
 </div>

@@ -11,12 +11,24 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+// PostgreSQL database
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
 
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "ConnectionStrings:DefaultConnection is missing. " +
+        "Configure it in appsettings.json or the environment variables.");
+}
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 6;
@@ -27,6 +39,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Login and logout paths
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -34,6 +47,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/Login";
 });
 
+// Google OAuth configuration
 var googleClientId =
     builder.Configuration["Authentication:Google:ClientId"];
 
@@ -49,7 +63,10 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
     {
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret;
+
         options.SignInScheme = IdentityConstants.ExternalScheme;
+
+        options.CallbackPath = "/signin-google";
 
         options.CorrelationCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SecurePolicy =
@@ -64,8 +81,6 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
         options.UserInformationEndpoint =
             "https://openidconnect.googleapis.com/v1/userinfo";
 
-        options.CallbackPath = "/signin-google";
-
         options.Scope.Add("openid");
         options.Scope.Add("email");
         options.Scope.Add("profile");
@@ -78,7 +93,8 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
 
             request.Headers.Authorization =
                 new AuthenticationHeaderValue(
-                    "Bearer", context.AccessToken);
+                    "Bearer",
+                    context.AccessToken);
 
             using var response = await context.Backchannel.SendAsync(
                 request,
@@ -86,33 +102,51 @@ if (!string.IsNullOrWhiteSpace(googleClientId) &&
 
             response.EnsureSuccessStatusCode();
 
-            using var user = JsonDocument.Parse(
-                await response.Content.ReadAsStringAsync(
-                    context.HttpContext.RequestAborted));
+            var responseBody = await response.Content.ReadAsStringAsync(
+                context.HttpContext.RequestAborted);
+
+            using var user = JsonDocument.Parse(responseBody);
 
             var root = user.RootElement;
+            var identity = context.Identity
+                ?? throw new InvalidOperationException(
+                    "Google did not return an authenticated identity.");
 
-            if (root.TryGetProperty("sub", out var sub))
-                context.Identity!.AddClaim(
-                    new Claim(
-                        ClaimTypes.NameIdentifier,
-                        sub.GetString()!));
+            if (root.TryGetProperty("sub", out var sub) &&
+                !string.IsNullOrWhiteSpace(sub.GetString()))
+            {
+                identity.AddClaim(new Claim(
+                    ClaimTypes.NameIdentifier,
+                    sub.GetString()!));
+            }
 
-            if (root.TryGetProperty("name", out var name))
-                context.Identity!.AddClaim(
-                    new Claim(
-                        ClaimTypes.Name,
-                        name.GetString()!));
+            if (root.TryGetProperty("name", out var name) &&
+                !string.IsNullOrWhiteSpace(name.GetString()))
+            {
+                identity.AddClaim(new Claim(
+                    ClaimTypes.Name,
+                    name.GetString()!));
+            }
 
-            if (root.TryGetProperty("email", out var email))
-                context.Identity!.AddClaim(
-                    new Claim(
-                        ClaimTypes.Email,
-                        email.GetString()!));
+            if (root.TryGetProperty("email", out var email) &&
+                !string.IsNullOrWhiteSpace(email.GetString()))
+            {
+                identity.AddClaim(new Claim(
+                    ClaimTypes.Email,
+                    email.GetString()!));
+            }
         };
     });
 }
+else
+{
+    // The app can run without Google login when credentials
+    // are not configured, but Google login will not be available.
+    Console.WriteLine(
+        "Google OAuth is not configured. Check the Google environment variables.");
+}
 
+// Render reverse-proxy / HTTPS support
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders =
@@ -125,6 +159,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 
+// Must run before HTTPS redirection and authentication.
 app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())
@@ -137,6 +172,7 @@ if (!app.Environment.IsDevelopment())
                 StatusCodes.Status500InternalServerError;
 
             context.Response.ContentType = "text/plain";
+
             await context.Response.WriteAsync(
                 "Something went wrong. Please try again.");
         });
