@@ -1,4 +1,3 @@
-
 @model IEnumerable<SmartExpenseManager.Models.Expense>
 
 @{
@@ -6,71 +5,374 @@
     bool isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1>Expenses</h1>
-            <p class="text-muted">Manage your daily expenses.</p>
-        </div>
-
-        @if (isLoggedIn)
-        {
-            <a asp-action="Create" class="btn btn-primary">
-                Add Expense
-            </a>
-        }
-        else
-        {
-            <a asp-controller="Account"
-               asp-action="Login"
-               class="btn btn-primary">
-                Log in
-            </a>
-        }
-    </div>
-
-    @if (!isLoggedIn)
-    {
-        <div class="alert alert-info">
-            <h5>Log in to manage your expenses</h5>
-            <p class="mb-0">
-                You can visit this page without an account.
-                Log in to view your personal expenses and add, edit, or delete them.
-            </p>
-        </div>
+<style>
+    .exp-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        color: #29283d;
     }
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    .exp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
 
-            @if (!Model.Any())
+    .exp-header h1 {
+        font-size: clamp(1.6rem, 3vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.8px;
+        margin: 0;
+    }
+
+    .exp-header p {
+        color: #9290a5;
+        font-size: .9rem;
+        margin: 7px 0 0;
+    }
+
+    .exp-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 17px;
+        border: 1px solid #e5e2f2;
+        border-radius: 10px;
+        background: #fff;
+        color: #5e55b8;
+        text-decoration: none;
+        font-size: .86rem;
+        font-weight: 700;
+        transition: background .15s ease;
+    }
+
+    .exp-btn:hover {
+        background: #f1efff;
+        color: #5143c0;
+    }
+
+    .exp-btn-primary {
+        background: #7968ed;
+        border-color: #7968ed;
+        color: white;
+    }
+
+    .exp-btn-primary:hover {
+        background: #6655d5;
+        border-color: #6655d5;
+        color: white;
+    }
+
+    .exp-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+        border: 1px solid #e5e1ff;
+        border-radius: 14px;
+        background: #f3f0ff;
+        color: #4d477e;
+    }
+
+    .exp-notice-icon {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: white;
+        color: #7968ed;
+        font-weight: 800;
+    }
+
+    .exp-notice h2 {
+        font-size: .95rem;
+        font-weight: 800;
+        margin: 2px 0 5px;
+    }
+
+    .exp-notice p {
+        color: #77718f;
+        font-size: .84rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .exp-panel {
+        overflow: hidden;
+        border: 1px solid #eeedf5;
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: 0 6px 24px rgba(46, 38, 91, .035);
+    }
+
+    .exp-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 23px 25px;
+        border-bottom: 1px solid #f0eef6;
+    }
+
+    .exp-panel-header h2 {
+        font-size: 1.02rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .exp-panel-header p {
+        font-size: .81rem;
+        color: #9996aa;
+        margin: 5px 0 0;
+    }
+
+    .exp-table-wrap {
+        padding: 0 17px 12px;
+    }
+
+    .exp-table {
+        margin: 0;
+        vertical-align: middle;
+        color: #48465d;
+        font-size: .85rem;
+        --bs-table-bg: transparent;
+    }
+
+    .exp-table thead th {
+        padding: 17px 12px;
+        color: #9692aa;
+        font-size: .72rem;
+        font-weight: 750;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border-bottom: 1px solid #eeedf5;
+    }
+
+    .exp-table tbody td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #f2f0f7;
+    }
+
+    .exp-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .exp-table tbody tr:hover {
+        background: #faf9ff;
+    }
+
+    .exp-category {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: #f0eeff;
+        color: #6b5bd0;
+        font-size: .76rem;
+        font-weight: 700;
+    }
+
+    .exp-description {
+        min-width: 120px;
+        max-width: 260px;
+        overflow-wrap: anywhere;
+        color: #77748a;
+    }
+
+    .exp-amount {
+        color: #302e46;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .exp-date {
+        color: #77748a;
+        white-space: nowrap;
+    }
+
+    .exp-payment {
+        color: #77748a;
+        white-space: nowrap;
+    }
+
+    .exp-actions {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .exp-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 10px;
+        border-radius: 8px;
+        border: 1px solid #e4e0f8;
+        color: #6d5cd6;
+        background: white;
+        text-decoration: none;
+        font-size: .77rem;
+        font-weight: 700;
+    }
+
+    .exp-action:hover {
+        background: #f2efff;
+        color: #4f40b8;
+    }
+
+    .exp-action-delete {
+        border-color: #f2dce4;
+        color: #c65b78;
+    }
+
+    .exp-action-delete:hover {
+        background: #fff0f4;
+        color: #a83c5c;
+    }
+
+    .exp-empty {
+        text-align: center;
+        padding: 48px 20px;
+    }
+
+    .exp-empty-icon {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 16px;
+        border-radius: 17px;
+        background: #f0eeff;
+        color: #7968ed;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    .exp-empty h3 {
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .exp-empty p {
+        max-width: 400px;
+        margin: 0 auto 20px;
+        color: #8b879d;
+        font-size: .87rem;
+        line-height: 1.7;
+    }
+
+    @@media (max-width: 767px) {
+        .exp-header {
+            align-items: flex-start;
+        }
+
+        .exp-panel-header {
+            padding: 18px;
+        }
+
+        .exp-table-wrap {
+            padding: 0 8px 8px;
+        }
+
+        .exp-table thead th,
+        .exp-table tbody td {
+            padding: 13px 10px;
+        }
+    }
+</style>
+
+<div class="container py-4 py-md-5">
+    <main class="exp-page">
+
+        <header class="exp-header">
+            <div>
+                <h1>Expenses</h1>
+                <p>Manage your daily expenses in one place.</p>
+            </div>
+
+            @if (isLoggedIn)
             {
-                <div class="text-center py-5">
-                    <h5>No expenses yet</h5>
+                <a asp-action="Create" class="exp-btn exp-btn-primary">
+                    <span aria-hidden="true">＋</span> Add Expense
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login"
+                   class="exp-btn exp-btn-primary">
+                    Log in to Continue <span aria-hidden="true">→</span>
+                </a>
+            }
+        </header>
+
+        @if (!isLoggedIn)
+        {
+            <section class="exp-notice">
+                <div class="exp-notice-icon" aria-hidden="true">i</div>
+                <div>
+                    <h2>Log in to manage your expenses</h2>
+                    <p>
+                        You can visit this page without an account.
+                        Log in to view your personal expenses and add, edit,
+                        or delete them.
+                    </p>
+                </div>
+            </section>
+        }
+
+        <section class="exp-panel" aria-labelledby="exp-list-heading">
+            <header class="exp-panel-header">
+                <div>
+                    <h2 id="exp-list-heading">Expense Transactions</h2>
+                    <p>Your recorded expenses and payment details.</p>
+                </div>
+            </header>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="exp-empty">
+                    <div class="exp-empty-icon" aria-hidden="true">₹</div>
+                    <h3>No expenses yet</h3>
 
                     @if (isLoggedIn)
                     {
-                        <p class="text-muted">
+                        <p>
                             Add your first expense to get started.
+                            Your recorded transactions will appear here.
                         </p>
 
-                        <a asp-action="Create" class="btn btn-primary">
-                            Add Expense
+                        <a asp-action="Create"
+                           class="exp-btn exp-btn-primary">
+                            ＋ Add Your First Expense
                         </a>
                     }
                     else
                     {
-                        <p class="text-muted">
-                            Your personal expenses will appear here after you log in.
+                        <p>
+                            Your personal expenses will appear here after
+                            you log in.
                         </p>
+
+                        <a asp-controller="Account" asp-action="Login"
+                           class="exp-btn exp-btn-primary">
+                            Log In
+                        </a>
                     }
                 </div>
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table align-middle">
+                <div class="table-responsive exp-table-wrap">
+                    <table class="table exp-table">
                         <thead>
                             <tr>
                                 <th>Category</th>
@@ -90,36 +392,46 @@
                             @foreach (var expense in Model)
                             {
                                 <tr>
-                                    <td>@expense.Category</td>
-
                                     <td>
+                                        <span class="exp-category">
+                                            @expense.Category
+                                        </span>
+                                    </td>
+
+                                    <td class="exp-description">
                                         @(string.IsNullOrEmpty(expense.Description)
                                             ? "-"
                                             : expense.Description)
                                     </td>
 
-                                    <td>₹@expense.Amount</td>
+                                    <td class="exp-amount">
+                                        ₹@expense.Amount.ToString("N2")
+                                    </td>
 
-                                    <td>
+                                    <td class="exp-date">
                                         @expense.ExpenseDate.ToString("dd MMM yyyy")
                                     </td>
 
-                                    <td>@expense.PaymentMethod</td>
+                                    <td class="exp-payment">
+                                        @expense.PaymentMethod
+                                    </td>
 
                                     @if (isLoggedIn)
                                     {
                                         <td>
-                                            <a asp-action="Edit"
-                                               asp-route-id="@expense.Id"
-                                               class="btn btn-sm btn-outline-primary me-2">
-                                                Edit
-                                            </a>
+                                            <div class="exp-actions">
+                                                <a asp-action="Edit"
+                                                   asp-route-id="@expense.Id"
+                                                   class="exp-action">
+                                                    Edit
+                                                </a>
 
-                                            <a asp-action="Delete"
-                                               asp-route-id="@expense.Id"
-                                               class="btn btn-sm btn-outline-danger">
-                                                Delete
-                                            </a>
+                                                <a asp-action="Delete"
+                                                   asp-route-id="@expense.Id"
+                                                   class="exp-action exp-action-delete">
+                                                    Delete
+                                                </a>
+                                            </div>
                                         </td>
                                     }
                                 </tr>
@@ -128,8 +440,7 @@
                     </table>
                 </div>
             }
+        </section>
 
-        </div>
-    </div>
-
+    </main>
 </div>

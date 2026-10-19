@@ -1,100 +1,638 @@
 @{
     ViewData["Title"] = "Dashboard";
+    var recentExpenses = ViewBag.RecentExpenses;
 }
 
-<div class="container mt-4">
+<style>
+    .dash-page {
+        display: flex;
+        min-height: 650px;
+        overflow: hidden;
+        border: 1px solid #e9e7f5;
+        border-radius: 22px;
+        background: #fafaff;
+        color: #29283d;
+        box-shadow: 0 12px 40px rgba(46, 38, 91, .07);
+    }
 
-    <div class="mb-4">
-        <h1>Dashboard</h1>
-        <p class="text-muted">
-            Here's an overview of your expenses.
-        </p>
-    </div>
+    .dash-sidebar {
+        width: 205px;
+        flex-shrink: 0;
+        padding: 26px 16px;
+        background: #fff;
+        border-right: 1px solid #eeedf5;
+        display: flex;
+        flex-direction: column;
+    }
 
-    <div class="row g-3 mb-4">
+    .dash-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 34px 4px;
+        color: #29283d;
+        font-size: 1rem;
+        font-weight: 800;
+    }
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <h6>Total Spent</h6>
-                <h2>₹@ViewBag.TotalSpent</h2>
-            </div>
-        </div>
+    .dash-brand-icon {
+        width: 35px;
+        height: 35px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #8070f6;
+        color: white;
+        font-weight: 800;
+    }
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <h6>This Month</h6>
-                <h2>₹@ViewBag.ThisMonthSpent</h2>
-            </div>
-        </div>
+    .dash-nav-label {
+        padding: 0 10px;
+        margin-bottom: 12px;
+        color: #a09db2;
+        font-size: .68rem;
+        font-weight: 750;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
 
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <h6>Transactions</h6>
-                <h2>@ViewBag.TransactionCount</h2>
-            </div>
-        </div>
+    .dash-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
 
-    </div>
+    .dash-nav a {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 11px;
+        border-radius: 10px;
+        color: #77748d;
+        text-decoration: none;
+        font-size: .87rem;
+        font-weight: 550;
+    }
 
-    <div class="card p-4 shadow-sm mb-4">
-        <h5>Top Spending Category</h5>
-        <h3>@ViewBag.TopCategory</h3>
-    </div>
+    .dash-nav a:hover {
+        background: #f3f1ff;
+        color: #6956dd;
+    }
 
-    <div class="card p-4 shadow-sm">
+    .dash-nav a.active {
+        background: #8070f6;
+        color: white;
+    }
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    .dash-nav-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
 
-            <h5>Recent Expenses</h5>
+    .dash-sidebar-bottom {
+        margin-top: auto;
+        padding-top: 28px;
+    }
 
-            <a asp-controller="Expenses"
-               asp-action="Create"
-               class="btn btn-primary">
-                Add Expense
-            </a>
+    .dash-main {
+        flex: 1;
+        min-width: 0;
+        padding: 30px;
+    }
 
-        </div>
+    .dash-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
 
-        @if (ViewBag.RecentExpenses.Count == 0)
-        {
-            <p class="text-muted">
-                No expenses yet. Add your first expense.
-            </p>
+    .dash-topbar h1 {
+        margin: 0;
+        font-size: clamp(1.4rem, 3vw, 1.85rem);
+        font-weight: 800;
+        letter-spacing: -.8px;
+    }
+
+    .dash-topbar p {
+        margin: 6px 0 0;
+        color: #9290a5;
+        font-size: .87rem;
+    }
+
+    .dash-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 10px 15px;
+        border: 1px solid #e5e2f2;
+        border-radius: 10px;
+        background: white;
+        color: #5e55b8;
+        text-decoration: none;
+        font-size: .84rem;
+        font-weight: 700;
+    }
+
+    .dash-btn:hover {
+        background: #f1efff;
+        color: #5143c0;
+    }
+
+    .dash-btn-primary {
+        background: #7968ed;
+        border-color: #7968ed;
+        color: white;
+    }
+
+    .dash-btn-primary:hover {
+        background: #6655d5;
+        border-color: #6655d5;
+        color: white;
+    }
+
+    .dash-section-title {
+        margin: 0 0 5px;
+        font-size: 1.03rem;
+        font-weight: 800;
+        color: #302e46;
+    }
+
+    .dash-section-subtitle {
+        margin: 0 0 17px;
+        color: #9996aa;
+        font-size: .82rem;
+    }
+
+    .dash-stat {
+        height: 100%;
+        padding: 21px;
+        background: #fff;
+        border: 1px solid #eeedf5;
+        border-radius: 15px;
+    }
+
+    .dash-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 19px;
+    }
+
+    .dash-stat-label {
+        color: #858198;
+        font-size: .83rem;
+        font-weight: 600;
+    }
+
+    .dash-stat-icon {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #eeebff;
+        color: #7865e9;
+        font-size: 1rem;
+    }
+
+    .dash-stat-icon.blue {
+        background: #eaf3ff;
+        color: #5289d7;
+    }
+
+    .dash-stat-icon.pink {
+        background: #fff0f6;
+        color: #d36c9a;
+    }
+
+    .dash-stat-value {
+        margin: 0;
+        color: #29283d;
+        font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: -.7px;
+        overflow-wrap: anywhere;
+    }
+
+    .dash-stat-caption {
+        margin: 8px 0 0;
+        color: #aaa6b9;
+        font-size: .76rem;
+    }
+
+    .dash-category {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 22px;
+        border: 1px solid #e9e5ff;
+        border-radius: 15px;
+        background: linear-gradient(110deg, #f1eeff, #faf8ff);
+        margin-top: 22px;
+        margin-bottom: 28px;
+    }
+
+    .dash-category-label {
+        margin-bottom: 7px;
+        color: #8176c9;
+        font-size: .77rem;
+        font-weight: 700;
+    }
+
+    .dash-category h3 {
+        margin: 0;
+        color: #39325e;
+        font-size: 1.25rem;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .dash-category-icon {
+        width: 45px;
+        height: 45px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: white;
+        color: #7865e9;
+        font-size: 1.3rem;
+    }
+
+    .dash-table-card {
+        overflow: hidden;
+        border: 1px solid #eeedf5;
+        border-radius: 16px;
+        background: white;
+    }
+
+    .dash-table-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 22px;
+        border-bottom: 1px solid #f0eef6;
+    }
+
+    .dash-table-heading h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .dash-table-heading p {
+        margin: 5px 0 0;
+        color: #9996aa;
+        font-size: .8rem;
+    }
+
+    .dash-table-wrap {
+        padding: 0 18px 12px;
+    }
+
+    .dash-table {
+        margin: 0;
+        color: #48465d;
+        font-size: .84rem;
+        vertical-align: middle;
+        --bs-table-bg: transparent;
+    }
+
+    .dash-table thead th {
+        padding: 16px 12px;
+        color: #9692aa;
+        font-size: .72rem;
+        font-weight: 750;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        white-space: nowrap;
+        border-bottom: 1px solid #eeedf5;
+    }
+
+    .dash-table tbody td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #f2f0f7;
+    }
+
+    .dash-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .dash-table tbody tr:hover {
+        background: #faf9ff;
+    }
+
+    .dash-amount {
+        color: #353252;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .dash-category-pill {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f0eeff;
+        color: #6b5bd0;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .dash-empty {
+        padding: 38px 20px;
+        text-align: center;
+    }
+
+    .dash-empty-icon {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: #f0eeff;
+        color: #7865e9;
+        font-size: 1.4rem;
+    }
+
+    .dash-empty h4 {
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .dash-empty p {
+        margin: 8px 0 18px;
+        color: #8b879d;
+        font-size: .86rem;
+    }
+
+    .dash-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 26px;
+        padding-top: 17px;
+        border-top: 1px solid #eceaf5;
+        color: #a09caf;
+        font-size: .77rem;
+    }
+
+    @@media (max-width: 767px) {
+        .dash-page {
+            flex-direction: column;
+            min-height: auto;
         }
-        else
-        {
-            <div class="table-responsive">
 
-                <table class="table">
-
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Payment</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach (var expense in ViewBag.RecentExpenses)
-                        {
-                            <tr>
-                                <td>@expense.Category</td>
-                                <td>₹@expense.Amount</td>
-                                <td>@expense.ExpenseDate.ToString("dd MMM yyyy")</td>
-                                <td>@expense.PaymentMethod</td>
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
+        .dash-sidebar {
+            width: 100%;
+            padding: 16px;
+            border-right: 0;
+            border-bottom: 1px solid #eeedf5;
         }
 
-    </div>
+        .dash-brand {
+            margin-bottom: 17px;
+        }
 
+        .dash-nav {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .dash-nav-label,
+        .dash-sidebar-bottom {
+            display: none;
+        }
+
+        .dash-nav a {
+            padding: 9px 11px;
+            font-size: .8rem;
+        }
+
+        .dash-main {
+            padding: 20px 15px;
+        }
+
+        .dash-table-heading {
+            padding: 18px;
+        }
+
+        .dash-table-wrap {
+            padding: 0 8px 8px;
+        }
+    }
+</style>
+
+<div class="container-fluid px-2 px-md-4 py-3 py-md-4">
+    <div class="dash-page">
+
+        <aside class="dash-sidebar">
+            <div class="dash-brand">
+                <span class="dash-brand-icon">S</span>
+                <span>Smart Expense</span>
+            </div>
+
+            <div class="dash-nav-label">Workspace</div>
+
+            <nav class="dash-nav" aria-label="Main navigation">
+                <a asp-controller="Home" asp-action="Index">
+                    <span class="dash-nav-icon">⌂</span>
+                    Home
+                </a>
+
+                <a asp-controller="Dashboard" asp-action="Index"
+                   class="active" aria-current="page">
+                    <span class="dash-nav-icon">▦</span>
+                    Dashboard
+                </a>
+
+                <a asp-controller="Expenses" asp-action="Index">
+                    <span class="dash-nav-icon">↗</span>
+                    Expenses
+                </a>
+            </nav>
+
+            <div class="dash-sidebar-bottom">
+                <div class="dash-nav-label">Account</div>
+                <nav class="dash-nav" aria-label="Account navigation">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Profile" asp-action="Index">
+                            <span class="dash-nav-icon">○</span>
+                            My Profile
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login">
+                            <span class="dash-nav-icon">↪</span>
+                            Login
+                        </a>
+
+                        <a asp-controller="Account" asp-action="Register">
+                            <span class="dash-nav-icon">＋</span>
+                            Register
+                        </a>
+                    }
+                </nav>
+            </div>
+        </aside>
+
+        <main class="dash-main">
+            <header class="dash-topbar">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Here's an overview of your expenses.</p>
+                </div>
+
+                <a asp-controller="Expenses" asp-action="Create"
+                   class="dash-btn dash-btn-primary">
+                    <span aria-hidden="true">＋</span> Add Expense
+                </a>
+            </header>
+
+            <section aria-label="Expense summary">
+                <h2 class="dash-section-title">Spending overview</h2>
+                <p class="dash-section-subtitle">
+                    A summary based on your recorded expenses.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <article class="dash-stat">
+                            <div class="dash-stat-top">
+                                <span class="dash-stat-label">Total Spent</span>
+                                <span class="dash-stat-icon" aria-hidden="true">₹</span>
+                            </div>
+
+                            <p class="dash-stat-value">
+                                ₹@(((decimal?)ViewBag.TotalSpent ?? 0m).ToString("N2"))
+                            </p>
+                            <p class="dash-stat-caption">All recorded expenses</p>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <article class="dash-stat">
+                            <div class="dash-stat-top">
+                                <span class="dash-stat-label">This Month</span>
+                                <span class="dash-stat-icon blue" aria-hidden="true">▦</span>
+                            </div>
+
+                            <p class="dash-stat-value">
+                                ₹@(((decimal?)ViewBag.ThisMonthSpent ?? 0m).ToString("N2"))
+                            </p>
+                            <p class="dash-stat-caption">Expenses this month</p>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <article class="dash-stat">
+                            <div class="dash-stat-top">
+                                <span class="dash-stat-label">Transactions</span>
+                                <span class="dash-stat-icon pink" aria-hidden="true">↗</span>
+                            </div>
+
+                            <p class="dash-stat-value">
+                                @((int?)ViewBag.TransactionCount ?? 0)
+                            </p>
+                            <p class="dash-stat-caption">Recorded transactions</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dash-category"
+                     aria-label="Top spending category">
+                <div>
+                    <div class="dash-category-label">SPENDING INSIGHT</div>
+                    <h3>Top Spending Category</h3>
+                    <div class="mt-2 fw-semibold">
+                        @(ViewBag.TopCategory ?? "No category yet")
+                    </div>
+                </div>
+
+                <div class="dash-category-icon" aria-hidden="true">◉</div>
+            </section>
+
+            <section class="dash-table-card"
+                     aria-labelledby="recent-expenses-heading">
+                <div class="dash-table-heading">
+                    <div>
+                        <h3 id="recent-expenses-heading">Recent Expenses</h3>
+                        <p>Your latest recorded transactions.</p>
+                    </div>
+
+                    <a asp-controller="Expenses" asp-action="Index"
+                       class="dash-btn">
+                        All Expenses <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+                 @if (recentExpenses is not System.Collections.IEnumerable expenses ||
+                     expenses.GetEnumerator() is not { } recentExpenseEnumerator ||
+                     !recentExpenseEnumerator.MoveNext())
+                {
+                    <div class="dash-empty">
+                        <div class="dash-empty-icon" aria-hidden="true">₹</div>
+                        <h4>No expenses yet</h4>
+                        <p>Add your first expense to start seeing your spending here.</p>
+                        <a asp-controller="Expenses" asp-action="Create"
+                           class="dash-btn dash-btn-primary">
+                            ＋ Add Your First Expense
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive dash-table-wrap">
+                        <table class="table dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var expense in recentExpenses!)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="dash-category-pill">
+                                                @expense.Category
+                                            </span>
+                                        </td>
+                                        <td class="dash-amount">
+                                            ₹@(((decimal)expense.Amount).ToString("N2"))
+                                        </td>
+                                        <td>
+                                            @expense.ExpenseDate.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td>@expense.PaymentMethod</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+
+            <footer class="dash-footer">
+                <span>Smart Expense Manager</span>
+                <span>Simple. Clear. Organised.</span>
+            </footer>
+        </main>
+    </div>
 </div>

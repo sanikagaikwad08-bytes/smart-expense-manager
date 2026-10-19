@@ -1,36 +1,78 @@
+@model SmartExpenseManager.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Continue with Google";
+    ViewData["Title"] = "Login";
 }
 
-<div class="container mt-5" style="max-width: 420px;">
-    <div class="card shadow-sm p-4">
-        <h2 class="text-center mb-2">Welcome</h2>
+<div class="auth-container">
+    <h2>Welcome Back</h2>
+    <p>Log in to manage your expenses.</p>
 
-        <p class="text-center text-muted mb-4">
-            Sign in or create your account to access your profile.
-        </p>
+    <form asp-controller="Account"
+          asp-action="Login"
+          method="post">
 
-        @if (TempData["Error"] is string error)
-        {
-            <div class="alert alert-danger">@error</div>
-        }
+        @Html.AntiForgeryToken()
 
-        <a asp-controller="Account"
-           asp-action="GoogleLogin"
-           class="btn btn-outline-dark w-100 py-2">
-            Continue with Google
-        </a>
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"></div>
 
-        <p class="text-center text-muted mt-3 mb-0">
-            New here? Your account will be created automatically.
-        </p>
+        <input type="hidden"
+               name="returnUrl"
+               value="@ViewBag.ReturnUrl" />
 
-        <div class="text-center mt-3">
-            <a asp-controller="Home"
-               asp-action="Index">
-                Back to home
-            </a>
+        <div class="mb-3">
+            <label asp-for="LoginId" class="form-label">
+                Username or Email
+            </label>
+
+            <input asp-for="LoginId"
+                   class="form-control"
+                   autocomplete="username"
+                   placeholder="Enter username or email" />
+
+            <span asp-validation-for="LoginId"
+                  class="text-danger"></span>
         </div>
-    </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">
+                Password
+            </label>
+
+            <input asp-for="Password"
+                   class="form-control"
+                   autocomplete="current-password"
+                   placeholder="Enter your password" />
+
+            <span asp-validation-for="Password"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="RememberMe"
+                   class="form-check-input" />
+
+            <label asp-for="RememberMe"
+                   class="form-check-label">
+                Remember me
+            </label>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary w-100">
+            Log In
+        </button>
+    </form>
+
+    <p class="auth-link mt-4 text-center">
+        Don't have an account?
+        <a asp-controller="Account" asp-action="Register">
+            Create account
+        </a>
+    </p>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

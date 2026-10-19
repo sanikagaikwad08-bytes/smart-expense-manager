@@ -1,9 +1,22 @@
-
-@model SmartExpenseManager.Controllers.ProfileViewModel
+@model SmartExpenseManager.Models.ApplicationUser
 
 @{
     ViewData["Title"] = "Profile";
-    var hasAvatar = !string.IsNullOrWhiteSpace(Model.AvatarUrl);
+
+    var hasSavedPhoto = Model.ProfileImage is { Length: > 0 };
+    var hasExternalPhoto = !string.IsNullOrWhiteSpace(Model.ProfilePictureUrl);
+
+    var avatarUrl = hasSavedPhoto
+        ? Url.Action("Photo", "Profile")
+        : hasExternalPhoto ? Model.ProfilePictureUrl : null;
+
+    var displayName = !string.IsNullOrWhiteSpace(Model.FullName)
+        ? Model.FullName
+        : Model.UserName ?? "User";
+
+    var initial = displayName.Length > 0
+        ? char.ToUpperInvariant(displayName[0]).ToString()
+        : "?";
 }
 
 <style>
@@ -101,13 +114,14 @@
     .profile-name {
         font-size: 1.6rem;
         font-weight: 700;
-        margin: 0 0 6px;
+        margin: 0 0 8px;
         overflow-wrap: anywhere;
     }
 
-    .profile-email {
+    .profile-detail {
         color: var(--muted);
-        font-size: .98rem;
+        font-size: .96rem;
+        margin: 6px 0;
         overflow-wrap: anywhere;
     }
 
@@ -157,32 +171,27 @@
         margin: 0;
     }
 
-    .profile-label {
-        color: #354765;
-        font-weight: 600;
-        font-size: .88rem;
-        margin-bottom: 7px;
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border);
     }
 
-    .profile-page .form-control {
-        min-height: 44px;
-        border-color: var(--border);
-        border-radius: 8px;
-        color: #263a58;
+    .info-row:last-child {
+        border-bottom: 0;
     }
 
-    .profile-page .form-control:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 .2rem rgba(40, 120, 232, .12);
-    }
-
-    .profile-page .form-control[readonly] {
-        background: #f6f8fc;
-    }
-
-    .profile-muted {
+    .info-label {
         color: var(--muted);
-        font-size: .84rem;
+        font-size: .9rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        text-align: right;
+        overflow-wrap: anywhere;
     }
 
     .profile-btn {
@@ -217,11 +226,6 @@
         color: #1764cb;
     }
 
-    .profile-btn:disabled {
-        opacity: .65;
-        cursor: not-allowed;
-    }
-
     .security-row {
         display: flex;
         align-items: center;
@@ -243,13 +247,6 @@
         color: var(--muted);
         font-size: .87rem;
         margin: 0;
-    }
-
-    .edit-only[hidden],
-    #editActions[hidden],
-    #displayName[hidden],
-    #photoSaveButton[hidden] {
-        display: none !important;
     }
 
     @@media (max-width: 576px) {
@@ -297,20 +294,18 @@
         <div class="alert alert-danger" role="alert">@error</div>
     }
 
-    <!-- Profile header -->
     <section class="profile-card profile-hero">
 
         <div class="avatar-wrap">
             <div class="profile-avatar">
-                <img id="profilePreview"
-                     src="@(hasAvatar ? Model.AvatarUrl : "")"
-                     alt="Profile photo"
-                     class="@(hasAvatar ? "" : "d-none")" />
-
-                <span id="profileInitial"
-                      class="@(hasAvatar ? "d-none" : "")">
-                    @Model.Initial
-                </span>
+                @if (!string.IsNullOrWhiteSpace(avatarUrl))
+                {
+                    <img src="@avatarUrl" alt="Profile photo" />
+                }
+                else
+                {
+                    <span>@initial</span>
+                }
             </div>
 
             <button type="button"
@@ -327,15 +322,20 @@
             </button>
         </div>
 
-        <h2 class="profile-name" id="displayName">
-            @(string.IsNullOrWhiteSpace(Model.FullName)
-                ? "Your Name"
-                : Model.FullName)
-        </h2>
+        <h2 class="profile-name">@displayName</h2>
 
-        <div class="profile-email">@Model.Email</div>
+        <p class="profile-detail">
+            <strong>Username:</strong> @(Model.UserName ?? "Not set")
+        </p>
 
-        <!-- Photo selection is handled by the camera button -->
+        <p class="profile-detail">
+            <strong>Gmail:</strong> @(Model.Email ?? "Not set")
+        </p>
+
+        <p class="profile-detail">
+            <strong>Age:</strong> @(Model.Age?.ToString() ?? "Not added")
+        </p>
+
         <form asp-action="UploadPhoto"
               method="post"
               enctype="multipart/form-data"
@@ -350,11 +350,11 @@
                    hidden />
 
             <div class="profile-actions">
-                <button type="button"
-                        class="profile-btn profile-btn-outline"
-                        id="editProfileButton">
+                <a asp-controller="Profile"
+                   asp-action="Edit"
+                   class="profile-btn profile-btn-outline">
                     Edit Profile
-                </button>
+                </a>
 
                 <button type="submit"
                         class="profile-btn"
@@ -365,7 +365,7 @@
             </div>
 
             <p id="photoMessage"
-               class="profile-muted mt-3 mb-0"
+               class="small mt-3 mb-0"
                role="status"
                aria-live="polite"></p>
         </form>
@@ -373,9 +373,7 @@
         <hr class="profile-divider" />
     </section>
 
-    <!-- Personal information -->
-    <section class="profile-card" id="personalInformation">
-
+    <section class="profile-card">
         <div class="section-heading">
             <div class="section-icon" aria-hidden="true">
                 <svg width="23" height="23" viewBox="0 0 24 24"
@@ -388,60 +386,45 @@
 
             <div>
                 <h2>Personal Information</h2>
-                <p>Your basic account information.</p>
+                <p>Your current account information.</p>
             </div>
         </div>
 
-        <form asp-action="UpdateName" method="post" id="nameForm">
+        <div class="info-row">
+            <span class="info-label">Full name</span>
+            <span class="info-value">
+                @(string.IsNullOrWhiteSpace(Model.FullName)
+                    ? "Not added"
+                    : Model.FullName)
+            </span>
+        </div>
 
-            @Html.AntiForgeryToken()
+        <div class="info-row">
+            <span class="info-label">Username</span>
+            <span class="info-value">@(Model.UserName ?? "Not set")</span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="FullName" class="profile-label">
-                    Full Name
-                </label>
+        <div class="info-row">
+            <span class="info-label">Email address</span>
+            <span class="info-value">@(Model.Email ?? "Not set")</span>
+        </div>
 
-                <input asp-for="FullName"
-                       class="form-control"
-                       maxlength="100"
-                       autocomplete="name"
-                       placeholder="Enter your full name"
-                       readonly />
+        <div class="info-row">
+            <span class="info-label">Age</span>
+            <span class="info-value">
+                @(Model.Age?.ToString() ?? "Not added")
+            </span>
+        </div>
 
-                <span asp-validation-for="FullName"
-                      class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="profileEmail" class="profile-label">
-                    Email Address
-                </label>
-
-                <input id="profileEmail"
-                       class="form-control"
-                       value="@Model.Email"
-                       readonly />
-
-                <p class="profile-muted mt-2 mb-0">
-                    Your email address is linked to your sign-in account.
-                </p>
-            </div>
-
-            <div class="profile-actions" id="editActions" hidden>
-                <button type="button"
-                        class="profile-btn profile-btn-outline"
-                        id="cancelEditButton">
-                    Cancel
-                </button>
-
-                <button type="submit" class="profile-btn">
-                    Save Changes
-                </button>
-            </div>
-        </form>
+        <div class="profile-actions">
+            <a asp-controller="Profile"
+               asp-action="Edit"
+               class="profile-btn">
+                Edit Information
+            </a>
+        </div>
     </section>
 
-    <!-- Account security -->
     <section class="profile-card">
         <div class="security-row">
             <div class="section-icon" aria-hidden="true">
@@ -455,7 +438,7 @@
 
             <div class="security-copy">
                 <h2>Account Security</h2>
-                <p>Your account is protected by your sign-in provider.</p>
+                <p>Your account is protected by your sign-in system.</p>
             </div>
         </div>
     </section>
@@ -463,40 +446,23 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
         (function () {
             const input = document.getElementById('photoInput');
             const cameraButton = document.getElementById('cameraButton');
-            const preview = document.getElementById('profilePreview');
-            const initial = document.getElementById('profileInitial');
-            const message = document.getElementById('photoMessage');
             const photoSaveButton = document.getElementById('photoSaveButton');
-
-            const editButton = document.getElementById('editProfileButton');
-            const cancelButton = document.getElementById('cancelEditButton');
-            const nameInput = document.getElementById('FullName');
-            const nameForm = document.getElementById('nameForm');
-            const editActions = document.getElementById('editActions');
-            const displayName = document.getElementById('displayName');
-            const personalInfo = document.getElementById('personalInformation');
-
-            const originalName = nameInput.value;
+            const message = document.getElementById('photoMessage');
+            const photoForm = document.getElementById('photoForm');
 
             cameraButton.addEventListener('click', function () {
                 input.click();
-            });
-
-            preview.addEventListener('error', function () {
-                preview.classList.add('d-none');
-                initial.classList.remove('d-none');
             });
 
             input.addEventListener('change', function () {
                 const file = input.files && input.files[0];
 
                 if (!file) {
+                    photoSaveButton.hidden = true;
                     return;
                 }
 
@@ -508,76 +474,30 @@
 
                 if (!allowedTypes.includes(file.type)) {
                     message.textContent =
-                        'Please select a JPG, PNG or WebP image.';
+                        'Choose a valid JPG, PNG, or WebP image.';
                     input.value = '';
                     photoSaveButton.hidden = true;
                     return;
                 }
 
-                const reader = new FileReader();
-
-                reader.onload = function (event) {
-                    preview.src = event.target.result;
-                    preview.classList.remove('d-none');
-                    initial.classList.add('d-none');
-
+                if (file.size > 2 * 1024 * 1024) {
                     message.textContent =
-                        'Photo selected. Save Photo to upload it.';
-
-                    photoSaveButton.hidden = false;
-                };
-
-                reader.onerror = function () {
-                    message.textContent =
-                        'The selected image could not be previewed. Please try another.';
+                        'Choose an image smaller than 2 MB.';
                     input.value = '';
                     photoSaveButton.hidden = true;
-                };
+                    return;
+                }
 
-                reader.readAsDataURL(file);
+                message.textContent =
+                    'Photo selected. Select Save Photo to upload it.';
+                photoSaveButton.hidden = false;
             });
 
-            document.getElementById('photoForm').addEventListener('submit', function (event) {
-                if (!input.files || !input.files.length) {
+            photoForm.addEventListener('submit', function (event) {
+                if (!input.files || input.files.length === 0) {
                     event.preventDefault();
                     message.textContent = 'Please choose a photo first.';
                 }
-            });
-
-            editButton.addEventListener('click', function () {
-                nameInput.readOnly = false;
-                nameInput.focus();
-
-                editActions.hidden = false;
-                editButton.hidden = true;
-
-                personalInfo.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            });
-
-            cancelButton.addEventListener('click', function () {
-                nameInput.value = originalName;
-                nameInput.readOnly = true;
-
-                editActions.hidden = true;
-                editButton.hidden = false;
-
-                nameInput.classList.remove('input-validation-error');
-
-                const validationMessage =
-                    document.querySelector('[data-valmsg-for="FullName"]');
-
-                if (validationMessage) {
-                    validationMessage.textContent = '';
-                    validationMessage.classList.remove('field-validation-error');
-                    validationMessage.classList.add('field-validation-valid');
-                }
-            });
-
-            nameForm.addEventListener('submit', function () {
-                nameInput.readOnly = false;
             });
         })();
     </script>

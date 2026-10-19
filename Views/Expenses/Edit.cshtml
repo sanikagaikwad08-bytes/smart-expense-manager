@@ -4,141 +4,275 @@
     ViewData["Title"] = "Edit Expense";
 }
 
-<div class="container mt-4">
+<style>
+    .edit-expense-page {
+        max-width: 1100px;
+        margin: 0 auto;
+        color: #29283d;
+    }
 
-    <div class="row justify-content-center">
+    .edit-expense-header {
+        margin-bottom: 25px;
+    }
 
-        <div class="col-md-6">
+    .edit-expense-header h1 {
+        font-size: clamp(1.55rem, 3vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.8px;
+        margin: 0 0 7px;
+    }
 
-            <div class="card p-4 shadow-sm">
+    .edit-expense-header p {
+        color: #9290a5;
+        font-size: .9rem;
+        margin: 0;
+    }
 
-                <h2 class="mb-4">Edit Expense</h2>
+    .edit-expense-card {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: clamp(22px, 4vw, 36px);
+        border: 1px solid #eeedf5;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 10px 35px rgba(46, 38, 91, .06);
+    }
 
-                <form asp-action="Edit" method="post">
+    .edit-expense-card-top {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-bottom: 23px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #f0eef6;
+    }
 
-                    <input type="hidden" asp-for="Id" />
+    .edit-expense-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background: #eeebff;
+        color: #7968ed;
+        font-size: 1.4rem;
+        font-weight: 800;
+    }
 
-                    <div asp-validation-summary="All"
-                         class="text-danger mb-3">
-                    </div>
+    .edit-expense-card-top h2 {
+        margin: 0 0 5px;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
 
-                    <div class="mb-3">
+    .edit-expense-card-top p {
+        margin: 0;
+        color: #9290a5;
+        font-size: .82rem;
+    }
 
-                        <label asp-for="Amount"
-                               class="form-label">
-                            Amount
-                        </label>
+    .edit-expense-form .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #48455f;
+        font-size: .86rem;
+        font-weight: 700;
+    }
 
-                        <input asp-for="Amount"
-                               class="form-control"
-                               type="number"
-                               step="0.01" />
+    .edit-expense-form .form-control,
+    .edit-expense-form .form-select {
+        min-height: 47px;
+        padding: 11px 13px;
+        border: 1px solid #e4e1f0;
+        border-radius: 10px;
+        background-color: #fdfdff;
+        color: #302e46;
+        font-size: .9rem;
+        box-shadow: none;
+    }
 
-                        <span asp-validation-for="Amount"
-                              class="text-danger">
-                        </span>
+    .edit-expense-form .form-control:focus,
+    .edit-expense-form .form-select:focus {
+        border-color: #9385f4;
+        box-shadow: 0 0 0 3px rgba(121, 104, 237, .12);
+        background: #fff;
+    }
 
-                    </div>
+    .edit-expense-form .field-validation-error {
+        display: block;
+        margin-top: 6px;
+        font-size: .8rem;
+    }
 
-                    <div class="mb-3">
+    .edit-expense-form .validation-summary-errors {
+        padding: 13px 15px;
+        border: 1px solid #f2dce4;
+        border-radius: 10px;
+        background: #fff4f6;
+        color: #b74765;
+        font-size: .85rem;
+    }
 
-                        <label asp-for="Category"
-                               class="form-label">
-                            Category
-                        </label>
+    .edit-expense-form .validation-summary-errors ul {
+        margin: 0;
+        padding-left: 20px;
+    }
 
-                        <select asp-for="Category"
-                                class="form-select">
+    .edit-expense-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid #f0eef6;
+    }
 
-                            @foreach (var category in SmartExpenseManager.Models.ExpenseOptions.Categories)
-                            {
-                                <option value="@category">
-                                    @category
-                                </option>
-                            }
+    .edit-expense-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 45px;
+        padding: 11px 20px;
+        border: 1px solid #e5e2f2;
+        border-radius: 10px;
+        background: #fff;
+        color: #5e55b8;
+        text-decoration: none;
+        font-size: .87rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .15s ease;
+    }
 
-                        </select>
+    .edit-expense-btn:hover {
+        background: #f1efff;
+        color: #5143c0;
+    }
 
-                        <span asp-validation-for="Category"
-                              class="text-danger">
-                        </span>
+    .edit-expense-btn-primary {
+        background: #7968ed;
+        border-color: #7968ed;
+        color: #fff;
+    }
 
-                    </div>
+    .edit-expense-btn-primary:hover {
+        background: #6655d5;
+        border-color: #6655d5;
+        color: #fff;
+    }
 
-                    <div class="mb-3">
+    @@media (max-width: 480px) {
+        .edit-expense-actions {
+            flex-direction: column;
+        }
 
-                        <label asp-for="Description"
-                               class="form-label">
-                            Description
-                        </label>
+        .edit-expense-btn {
+            width: 100%;
+        }
+    }
+</style>
 
-                        <input asp-for="Description"
-                               class="form-control" />
+<div class="container py-4 py-md-5">
+    <main class="edit-expense-page">
 
-                    </div>
+        <header class="edit-expense-header">
+            <h1>Edit Expense</h1>
+            <p>Update the details of your recorded expense.</p>
+        </header>
 
-                    <div class="mb-3">
-
-                        <label asp-for="ExpenseDate"
-                               class="form-label">
-                            Date
-                        </label>
-
-                        <input asp-for="ExpenseDate"
-                               class="form-control"
-                               type="date" />
-
-                        <span asp-validation-for="ExpenseDate"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="mb-4">
-
-                        <label asp-for="PaymentMethod"
-                               class="form-label">
-                            Payment Method
-                        </label>
-
-                        <select asp-for="PaymentMethod"
-                                class="form-select">
-
-                            @foreach (var method in SmartExpenseManager.Models.ExpenseOptions.PaymentMethods)
-                            {
-                                <option value="@method">
-                                    @method
-                                </option>
-                            }
-
-                        </select>
-
-                        <span asp-validation-for="PaymentMethod"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="d-flex gap-2">
-
-                        <button type="submit"
-                                class="btn btn-primary">
-                            Save Changes
-                        </button>
-
-                        <a asp-action="Index"
-                           class="btn btn-secondary">
-                            Cancel
-                        </a>
-
-                    </div>
-
-                </form>
-
+        <section class="edit-expense-card">
+            <div class="edit-expense-card-top">
+                <div class="edit-expense-icon" aria-hidden="true">₹</div>
+                <div>
+                    <h2>Expense details</h2>
+                    <p>Make your changes and save when you're ready.</p>
+                </div>
             </div>
 
-        </div>
+            <form asp-action="Edit" method="post"
+                  class="edit-expense-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
 
-    </div>
+                <div asp-validation-summary="All"
+                     class="text-danger mb-4"></div>
 
+                <div class="mb-4">
+                    <label asp-for="Amount" class="form-label">
+                        Amount (₹)
+                    </label>
+                    <input asp-for="Amount" class="form-control"
+                           type="number" step="0.01" min="0.01"
+                           placeholder="Enter amount" />
+                    <span asp-validation-for="Amount"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Category" class="form-label">
+                        Category
+                    </label>
+                    <select asp-for="Category" class="form-select">
+                        @foreach (var category in SmartExpenseManager.Models.ExpenseOptions.Categories)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Category"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label">
+                        Description
+                    </label>
+                    <input asp-for="Description" class="form-control"
+                           placeholder="What was this expense for?" />
+                    <span asp-validation-for="Description"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ExpenseDate" class="form-label">
+                        Expense date
+                    </label>
+                    <input asp-for="ExpenseDate" class="form-control"
+                           type="date" />
+                    <span asp-validation-for="ExpenseDate"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="PaymentMethod" class="form-label">
+                        Payment method
+                    </label>
+                    <select asp-for="PaymentMethod" class="form-select">
+                        @foreach (var method in SmartExpenseManager.Models.ExpenseOptions.PaymentMethods)
+                        {
+                            <option value="@method">@method</option>
+                        }
+                    </select>
+                    <span asp-validation-for="PaymentMethod"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="edit-expense-actions">
+                    <button type="submit"
+                            class="edit-expense-btn edit-expense-btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a asp-action="Index" class="edit-expense-btn">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+
+    </main>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

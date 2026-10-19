@@ -1,0 +1,70 @@
+@model SmartExpenseManager.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>Edit Profile</h2>
+        <p class="auth-subtitle">Update your personal information.</p>
+
+        <form asp-controller="Profile" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">Username</label>
+                <input asp-for="UserName"
+                       class="form-control"
+                       autocomplete="username"
+                       required />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Gmail address</label>
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control"
+                       autocomplete="email"
+                       required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Full name</label>
+                <input asp-for="FullName"
+                       class="form-control"
+                       autocomplete="name"
+                       required />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Age" class="form-label">Age</label>
+                <input asp-for="Age"
+                       type="number"
+                       class="form-control"
+                       min="1"
+                       max="120" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Save Changes
+            </button>
+
+            <a asp-controller="Profile"
+               asp-action="Index"
+               class="btn btn-outline-secondary w-100 mt-2">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

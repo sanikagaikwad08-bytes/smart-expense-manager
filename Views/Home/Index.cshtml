@@ -1,62 +1,529 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Smart Expense Manager";
 }
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Smart Expense Manager</h1>
-        <p class="lead text-muted">
-            Track your expenses and understand where your money goes.
-        </p>
-        <a asp-controller="Profile"
-           asp-action="Index"
-           class="btn btn-primary mt-3">
-            Continue with Google to access your profile
-        </a>
-    </div>
+<style>
+    .se-app {
+        display: flex;
+        min-height: 650px;
+        overflow: hidden;
+        background: #f4f3ff;
+        border: 1px solid #e9e7fa;
+        border-radius: 22px;
+        color: #29283d;
+        box-shadow: 0 12px 40px rgba(46, 38, 91, .08);
+    }
 
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h4>Track Expenses</h4>
-                    <p>Add and manage your daily expenses in one place.</p>
-                    <a asp-controller="Expenses"
-                       asp-action="Index"
-                       class="btn btn-outline-primary">
-                        Track Expenses
-                    </a>
-                </div>
-            </div>
-        </div>
+    .se-sidebar {
+        width: 205px;
+        flex-shrink: 0;
+        padding: 26px 16px;
+        background: #fff;
+        border-right: 1px solid #eeedf5;
+        display: flex;
+        flex-direction: column;
+    }
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h4>View Dashboard</h4>
-                    <p>See your spending totals and recent transactions.</p>
-                    <a asp-controller="Dashboard"
-                       asp-action="Index"
-                       class="btn btn-outline-primary">
-                        View Dashboard
-                    </a>
-                </div>
-            </div>
-        </div>
+    .se-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 34px 4px;
+        color: #29283d;
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: -.4px;
+    }
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h4>Manage Profile</h4>
-                    <p>Update your personal account information.</p>
-                    <a asp-controller="Profile"
-                       asp-action="Index"
-                       class="btn btn-outline-primary">
-                        Manage Profile
-                    </a>
-                </div>
+    .se-brand-icon {
+        width: 35px;
+        height: 35px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: #7e6af4;
+        color: white;
+        font-weight: 800;
+    }
+
+    .se-nav-label {
+        padding: 0 10px;
+        margin-bottom: 12px;
+        color: #a09db2;
+        font-size: .68rem;
+        font-weight: 750;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .se-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .se-nav a {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 11px;
+        border-radius: 10px;
+        color: #77748d;
+        text-decoration: none;
+        font-size: .87rem;
+        font-weight: 550;
+        transition: background .15s, color .15s;
+    }
+
+    .se-nav a:hover {
+        background: #f3f1ff;
+        color: #6956dd;
+    }
+
+    .se-nav a.se-active {
+        background: #8070f6;
+        color: white;
+    }
+
+    .se-nav-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .se-sidebar-bottom {
+        margin-top: auto;
+        padding-top: 28px;
+    }
+
+    .se-main {
+        flex: 1;
+        min-width: 0;
+        padding: 30px;
+        background: #fafaff;
+    }
+
+    .se-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .se-topbar h1 {
+        margin: 0;
+        font-size: clamp(1.35rem, 3vw, 1.8rem);
+        font-weight: 800;
+        letter-spacing: -.8px;
+        color: #29283d;
+    }
+
+    .se-topbar p {
+        margin: 6px 0 0;
+        color: #9290a5;
+        font-size: .87rem;
+    }
+
+    .se-account-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .se-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 15px;
+        border: 1px solid #e5e2f2;
+        border-radius: 10px;
+        background: white;
+        color: #5e55b8;
+        text-decoration: none;
+        font-size: .84rem;
+        font-weight: 700;
+    }
+
+    .se-btn:hover {
+        background: #f1efff;
+        color: #5143c0;
+    }
+
+    .se-btn-primary {
+        background: #7968ed;
+        border-color: #7968ed;
+        color: white;
+    }
+
+    .se-btn-primary:hover {
+        background: #6655d5;
+        border-color: #6655d5;
+        color: white;
+    }
+
+    .se-welcome {
+        position: relative;
+        overflow: hidden;
+        padding: 29px;
+        border: 1px solid #e8e4ff;
+        border-radius: 17px;
+        background: linear-gradient(115deg, #f0edff, #f8f6ff 75%);
+        margin-bottom: 28px;
+    }
+
+    .se-welcome::after {
+        content: "";
+        position: absolute;
+        width: 155px;
+        height: 155px;
+        right: -42px;
+        top: -65px;
+        border: 25px solid rgba(132, 112, 246, .09);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .se-eyebrow {
+        margin-bottom: 10px;
+        color: #7968df;
+        font-size: .7rem;
+        font-weight: 800;
+        letter-spacing: 1.3px;
+        text-transform: uppercase;
+    }
+
+    .se-welcome h2 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.8px;
+        color: #302d50;
+    }
+
+    .se-welcome p {
+        position: relative;
+        z-index: 1;
+        max-width: 470px;
+        margin: 11px 0 20px;
+        color: #77748f;
+        font-size: .91rem;
+        line-height: 1.7;
+    }
+
+    .se-section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .se-section-heading h3 {
+        margin: 0;
+        color: #302e46;
+        font-size: 1.04rem;
+        font-weight: 800;
+    }
+
+    .se-section-heading p {
+        margin: 5px 0 0;
+        color: #9996aa;
+        font-size: .81rem;
+    }
+
+    .se-feature {
+        height: 100%;
+        padding: 23px;
+        border: 1px solid #eeedf5;
+        border-radius: 15px;
+        background: white;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .se-feature:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 9px 24px rgba(48, 42, 92, .07);
+    }
+
+    .se-feature-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .se-feature-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: #eeeaff;
+        color: #7865e9;
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .se-feature-icon.blue {
+        background: #eaf3ff;
+        color: #5289d7;
+    }
+
+    .se-feature-number {
+        color: #c1bed0;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .se-feature h4 {
+        margin: 0 0 9px;
+        color: #302e46;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .se-feature p {
+        min-height: 48px;
+        margin: 0 0 20px;
+        color: #89869c;
+        font-size: .84rem;
+        line-height: 1.7;
+    }
+
+    .se-feature-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: #7562e3;
+        text-decoration: none;
+        font-size: .85rem;
+        font-weight: 750;
+    }
+
+    .se-feature-link:hover {
+        color: #5140be;
+        text-decoration: underline;
+    }
+
+    .se-footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+        padding-top: 17px;
+        border-top: 1px solid #eceaf5;
+        color: #a09caf;
+        font-size: .77rem;
+    }
+
+    @@media (max-width: 767px) {
+        .se-app {
+            flex-direction: column;
+            min-height: auto;
+        }
+
+        .se-sidebar {
+            width: 100%;
+            padding: 16px;
+            border-right: 0;
+            border-bottom: 1px solid #eeedf5;
+        }
+
+        .se-brand {
+            margin-bottom: 17px;
+        }
+
+        .se-nav {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .se-nav-label,
+        .se-sidebar-bottom {
+            display: none;
+        }
+
+        .se-nav a {
+            padding: 9px 11px;
+            font-size: .8rem;
+        }
+
+        .se-main {
+            padding: 20px 16px;
+        }
+
+        .se-welcome {
+            padding: 23px;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .se-feature,
+        .se-nav a {
+            transition: none;
+        }
+
+        .se-feature:hover {
+            transform: none;
+        }
+    }
+</style>
+
+<div class="container-fluid px-2 px-md-4 py-3 py-md-4">
+    <div class="se-app">
+
+        <aside class="se-sidebar">
+            <div class="se-brand">
+                <span class="se-brand-icon">S</span>
+                <span>Smart Expense</span>
             </div>
-        </div>
+
+            <div class="se-nav-label">Workspace</div>
+
+            <nav class="se-nav" aria-label="Main navigation">
+                <a asp-controller="Home" asp-action="Index"
+                   class="se-active">
+                    <span class="se-nav-icon">⌂</span>
+                    Home
+                </a>
+
+                <a asp-controller="Dashboard" asp-action="Index">
+                    <span class="se-nav-icon">▦</span>
+                    Dashboard
+                </a>
+
+                <a asp-controller="Expenses" asp-action="Index">
+                    <span class="se-nav-icon">↗</span>
+                    Expenses
+                </a>
+            </nav>
+
+            <div class="se-sidebar-bottom">
+                <div class="se-nav-label">Account</div>
+                <nav class="se-nav" aria-label="Account navigation">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Profile" asp-action="Index">
+                            <span class="se-nav-icon">○</span>
+                            My Profile
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login">
+                            <span class="se-nav-icon">↪</span>
+                            Login
+                        </a>
+
+                        <a asp-controller="Account" asp-action="Register">
+                            <span class="se-nav-icon">＋</span>
+                            Register
+                        </a>
+                    }
+                </nav>
+            </div>
+        </aside>
+
+        <main class="se-main">
+            <header class="se-topbar">
+                <div>
+                    <h1>Welcome to your workspace</h1>
+                    <p>It’s a little easier to manage your money when it’s organised.</p>
+                </div>
+
+                <div class="se-account-actions">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Profile" asp-action="Index"
+                           class="se-btn">My Profile</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login"
+                           class="se-btn">Login</a>
+
+                        <a asp-controller="Account" asp-action="Register"
+                           class="se-btn se-btn-primary">Register</a>
+                    }
+                </div>
+            </header>
+
+            <section class="se-welcome">
+                <div class="se-eyebrow">Your personal finance space</div>
+                <h2>Make room for better money habits.</h2>
+                <p>
+                    Keep your daily expenses organised and review your
+                    spending in one simple place.
+                </p>
+
+                <a asp-controller="Expenses" asp-action="Index"
+                   class="se-btn se-btn-primary">
+                    Go to Expenses <span aria-hidden="true">&nbsp; →</span>
+                </a>
+            </section>
+
+            <section aria-labelledby="workspace-title">
+                <div class="se-section-heading">
+                    <div>
+                        <h3 id="workspace-title">Your workspace</h3>
+                        <p>Choose a section to get started.</p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <article class="se-feature">
+                            <div class="se-feature-head">
+                                <div class="se-feature-icon"
+                                     aria-hidden="true">₹</div>
+                                <span class="se-feature-number">01</span>
+                            </div>
+
+                            <h4>Track Expenses</h4>
+                            <p>
+                                Add and manage your daily expenses.
+                                Keep your transactions organised in one place.
+                            </p>
+
+                            <a asp-controller="Expenses" asp-action="Index"
+                               class="se-feature-link">
+                                Manage Expenses <span aria-hidden="true">→</span>
+                            </a>
+                        </article>
+                    </div>
+
+                    <div class="col-md-6">
+                        <article class="se-feature">
+                            <div class="se-feature-head">
+                                <div class="se-feature-icon blue"
+                                     aria-hidden="true">▥</div>
+                                <span class="se-feature-number">02</span>
+                            </div>
+
+                            <h4>View Dashboard</h4>
+                            <p>
+                                Open your existing dashboard to review
+                                spending totals and recent transactions.
+                            </p>
+
+                            <a asp-controller="Dashboard" asp-action="Index"
+                               class="se-feature-link">
+                                Open Dashboard <span aria-hidden="true">→</span>
+                            </a>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="se-footer">
+                <span>Smart Expense Manager</span>
+                <span>Simple. Clear. Organised.</span>
+            </footer>
+        </main>
     </div>
 </div>

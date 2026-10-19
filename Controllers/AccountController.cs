@@ -1,9 +1,6 @@
-
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SmartExpenseManager.Models;
-using System.Security.Claims;
 
 namespace SmartExpenseManager.Controllers
 {
@@ -11,137 +8,113 @@ namespace SmartExpenseManager.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _config;
 
         public AccountController(
             SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager,
-            IConfiguration config)
+            UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _config = config;
         }
 
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            ViewBag.GoogleEnabled =
-                !string.IsNullOrWhiteSpace(
-                    _config["Authentication:Google:ClientId"])
-                && !string.IsNullOrWhiteSpace(
-                    _config["Authentication:Google:ClientSecret"]);
-
             return View();
         }
 
-        [HttpGet]
-        public IActionResult Register(string? returnUrl = null)
-        {
-            return RedirectToAction(nameof(Login), new { returnUrl });
-        }
-
-        [HttpGet]
-        public IActionResult GoogleLogin(string? returnUrl = null)
-        {
-            var clientId = _config["Authentication:Google:ClientId"];
-            var clientSecret = _config["Authentication:Google:ClientSecret"];
-
-            if (string.IsNullOrWhiteSpace(clientId) ||
-                string.IsNullOrWhiteSpace(clientSecret))
-            {
-                return StatusCode(
-                    500,
-                    "Google sign-in is not configured. Check the app's environment settings.");
-            }
-
-            if (!Url.IsLocalUrl(returnUrl))
-                returnUrl = null;
-
-            var callbackUrl = Url.Action(
-                nameof(GoogleResponse),
-                "Account",
-                new { returnUrl });
-
-            var properties =
-                _signInManager.ConfigureExternalAuthenticationProperties(
-                    "Google", callbackUrl);
-
-            return Challenge(properties, "Google");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GoogleResponse(
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(
+            LoginViewModel model,
             string? returnUrl = null)
         {
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            ViewBag.ReturnUrl = returnUrl;
 
-            if (info == null || info.LoginProvider != "Google")
-            {
-                TempData["Error"] =
-                    "Google sign-in did not complete. Please try again.";
+            if (!ModelState.IsValid)
+                return View(model);
 
-                return RedirectToAction(nameof(Login));
-            }
+            var loginId = model.LoginId.Trim();
 
-            var signInResult =
-                await _signInManager.ExternalLoginSignInAsync(
-                    info.LoginProvider,
-                    info.ProviderKey,
-                    isPersistent: true);
-
-            if (signInResult.Succeeded)
-                return SafeRedirect(returnUrl);
-
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                TempData["Error"] =
-                    "Google did not provide an email address. Please try again.";
-
-                return RedirectToAction(nameof(Login));
-            }
-
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = loginId.Contains('@')
+                ? await _userManager.FindByEmailAsync(loginId)
+                : await _userManager.FindByNameAsync(loginId);
 
             if (user == null)
             {
-                user = new ApplicationUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FullName = string.IsNullOrWhiteSpace(name) ? email : name,
-                    EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
-                };
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Invalid username/email or password.");
 
-                var createResult = await _userManager.CreateAsync(user);
-
-                if (!createResult.Succeeded)
-                {
-                    TempData["Error"] =
-                        "Could not create your account. Please try again.";
-
-                    return RedirectToAction(nameof(Login));
-                }
+                return View(model);
             }
 
-            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName!,
+                model.Password,
+                model.RememberMe,
+                lockoutOnFailure: true);
 
-            if (!addLoginResult.Succeeded)
+            if (result.Succeeded)
             {
-                TempData["Error"] =
-                    "Could not connect your Google account. Please try again.";
+                if (!string.IsNullOrWhiteSpace(returnUrl) &&
+                    Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
 
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction("Index", "Dashboard");
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: true);
+            ModelState.AddModelError(
+                string.Empty,
+                "Invalid username/email or password.");
 
-            return SafeRedirect(returnUrl);
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(
+            RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Username.Trim(),
+                Email = model.Email.Trim()
+            };
+
+            var result = await _userManager.CreateAsync(
+                user,
+                model.Password);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(
+                    user,
+                    isPersistent: false);
+
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    error.Description);
+            }
+
+            return View(model);
         }
 
         [HttpPost]
@@ -149,18 +122,8 @@ namespace SmartExpenseManager.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+
             return RedirectToAction("Index", "Home");
-        }
-
-        private IActionResult SafeRedirect(string? returnUrl)
-        {
-            if (!string.IsNullOrWhiteSpace(returnUrl) &&
-                Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-
-            return RedirectToAction("Index", "Dashboard");
         }
     }
 }
